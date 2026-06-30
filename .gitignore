@@ -39,3 +39,6 @@ yarn-error.log
 /public/videos/*.original.mp4
 /public/videos/*.tmp.mp4
 /public/storage
+/public/images/*.png
+/desktop/
+/dist-desktop/

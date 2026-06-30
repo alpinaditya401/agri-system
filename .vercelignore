@@ -15,6 +15,7 @@ storage/framework/sessions/*
 storage/framework/testing/*
 storage/framework/views/*
 public/storage
+public/images/*.png
 public/videos/*.original.mp4
 public/videos/*.tmp.mp4
 public/images/agrilink_logo.png
@@ -23,3 +24,5 @@ public/images/landing/*.png
 public/images/articles/*.png
 public/images/commodities/*.png
 database/exports
+desktop
+dist-desktop

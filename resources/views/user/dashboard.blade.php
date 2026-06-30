@@ -26,6 +26,10 @@
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.75c-3.75 0-6.75 2.1-6.75 4.7 0 4.05 4.65 5.8 6.75 8.05 2.1-2.25 6.75-4 6.75-8.05 0-2.6-3-4.7-6.75-4.7Zm0 0V3m-4.5 7.5c1.5 0 3 .75 4.5 2.25 1.5-1.5 3-2.25 4.5-2.25" /></svg>
                     Daftar Jadi Penjual
                 </a>
+                <a href="{{ route('buyer.become-distributor.create') }}" class="ag-btn-secondary">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8m-8 4h8m-8 4h5M5 5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5z" /></svg>
+                    Ajukan Distributor
+                </a>
             </div>
         </div>
     </x-slot:header>

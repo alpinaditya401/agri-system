@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\FarmerProfile;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -54,6 +55,14 @@ class FarmerVerificationController extends Controller
             'verified_by'         => auth()->id(),
         ]);
 
+        Notification::sendToUser(
+            $farmer->id,
+            'info',
+            'Pengajuan penjual disetujui',
+            'Akun Anda sudah diverifikasi sebagai penjual/petani. Anda sekarang bisa mengelola produk, pesanan, dan pengajuan pupuk.',
+            route('farmer.dashboard')
+        );
+
         return back()->with('success', "Petani {$farmer->name} berhasil diverifikasi.");
     }
 
@@ -77,6 +86,14 @@ class FarmerVerificationController extends Controller
             'rejection_reason'    => $request->input('rejection_reason'),
             'verified_by'         => auth()->id(),
         ]);
+
+        Notification::sendToUser(
+            $farmer->id,
+            'alert',
+            'Pengajuan penjual ditolak',
+            'Pengajuan penjual/petani Anda ditolak. Alasan: ' . $request->input('rejection_reason'),
+            route('farmer.dashboard')
+        );
 
         return back()->with('success', "Verifikasi petani {$farmer->name} ditolak.");
     }

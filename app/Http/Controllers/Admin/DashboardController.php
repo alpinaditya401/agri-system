@@ -33,7 +33,13 @@ class DashboardController extends Controller
             'total_farmers'      => $usersForRegion()->whereHas('role', fn($q) => $q->where('name', 'farmer'))->count(),
             'total_buyers'       => $usersForRegion()->whereHas('role', fn($q) => $q->where('name', 'buyer'))->count(),
             'total_distributors' => $usersForRegion()->whereHas('role', fn($q) => $q->where('name', 'distributor'))->count(),
+            'active_subsidy_distributors' => $usersForRegion()
+                ->where('is_active', true)
+                ->whereHas('role', fn($q) => $q->where('name', 'distributor'))
+                ->whereHas('distributorProfile', fn($q) => $q->where('verification_status', 'verified'))
+                ->count(),
             'pending_verifications' => $usersForRegion()->whereHas('farmerProfile', fn($q) => $q->where('verification_status', 'pending'))->count(),
+            'pending_distributor_verifications' => $usersForRegion()->whereHas('distributorProfile', fn($q) => $q->where('verification_status', 'pending'))->count(),
             'total_orders'       => $ordersForRegion()->count(),
             'pending_orders'     => $ordersForRegion()->where('order_status', 'pending')->count(),
             'fertilizer_transactions' => $fertilizerForRegion()->where('status', 'pending')->count(),
@@ -52,6 +58,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'fertilizerInventory', 'latestArticles', 'pendingFarmers', 'regionFilters', 'regionOptions'));
+        $pendingDistributors = $usersForRegion()->with('distributorProfile')
+            ->whereHas('distributorProfile', fn($q) => $q->where('verification_status', 'pending'))
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'fertilizerInventory', 'latestArticles', 'pendingFarmers', 'pendingDistributors', 'regionFilters', 'regionOptions'));
     }
 }

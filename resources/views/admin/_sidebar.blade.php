@@ -14,6 +14,10 @@
     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 014-4h4m0 0l-3-3m3 3l-3 3M4 7h16M4 7a2 2 0 002 2h12a2 2 0 002-2M4 7a2 2 0 012-2h12a2 2 0 012 2"/></svg>
     <span class="whitespace-nowrap">Distribusi Pupuk</span>
 </a>
+<a href="{{ route('admin.reports.agriculture') }}" class="sidebar-link {{ request()->routeIs('admin.reports.agriculture') ? 'active' : '' }}">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19V8m4 11V5m4 14v-8m4 8V7m4 12V4" /></svg>
+    <span class="whitespace-nowrap">Statistik Pertanian</span>
+</a>
 <a href="{{ route('admin.users.index') }}" class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
     <span class="whitespace-nowrap">Manajemen Pengguna</span>
@@ -27,6 +31,10 @@
 <a href="{{ route('admin.farmers.verify.index') }}" class="sidebar-link {{ request()->routeIs('admin.farmers.*') ? 'active' : '' }}">
     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
     <span class="whitespace-nowrap">Verifikasi Petani</span>
+</a>
+<a href="{{ route('admin.distributors.verify.index') }}" class="sidebar-link {{ request()->routeIs('admin.distributors.*') ? 'active' : '' }}">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75 11.25 15 15 9.75M4.5 6.75h15v10.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 17.25V6.75zM8.25 6.75V4.5h7.5v2.25" /></svg>
+    <span class="whitespace-nowrap">Verifikasi Distributor</span>
 </a>
 <a href="{{ route('admin.reports.prices') }}" class="sidebar-link {{ request()->routeIs('admin.reports.prices') ? 'active' : '' }}">
     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>

@@ -13,6 +13,7 @@ use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\FarmerVerificationController;
+use App\Http\Controllers\Admin\DistributorVerificationController;
 use App\Http\Controllers\Admin\FertilizerQuotaAdminController;
 use App\Http\Controllers\Admin\PaymentSettingsController;
 use App\Http\Controllers\Admin\ReportController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Buyer\ProductController as BuyerProductController;
 use App\Http\Controllers\Buyer\CartController;
 use App\Http\Controllers\Buyer\OrderController as BuyerOrderController;
 use App\Http\Controllers\Buyer\FarmerRegistrationController as BuyerFarmerRegistrationController;
+use App\Http\Controllers\Buyer\DistributorRegistrationController as BuyerDistributorRegistrationController;
 
 use App\Http\Controllers\Distributor\DashboardController as DistributorDashboard;
 use App\Http\Controllers\Distributor\StockController;
@@ -121,6 +123,11 @@ Route::middleware(['auth', 'role:admin,admin_master'])
     Route::patch('verifikasi-petani/{farmer}/approve', [FarmerVerificationController::class, 'approve'])->name('farmers.verify.approve');
     Route::patch('verifikasi-petani/{farmer}/reject', [FarmerVerificationController::class, 'reject'])->name('farmers.verify.reject');
 
+    // Distributor verification
+    Route::get('verifikasi-distributor', [DistributorVerificationController::class, 'index'])->name('distributors.verify.index');
+    Route::patch('verifikasi-distributor/{distributor}/approve', [DistributorVerificationController::class, 'approve'])->name('distributors.verify.approve');
+    Route::patch('verifikasi-distributor/{distributor}/reject', [DistributorVerificationController::class, 'reject'])->name('distributors.verify.reject');
+
     // Fertilizer quota management
     Route::get('kuota-pupuk', [FertilizerQuotaAdminController::class, 'index'])->name('fertilizer.quota.index');
     Route::post('kuota-pupuk/alokasi', [FertilizerQuotaAdminController::class, 'allocate'])->name('fertilizer.quota.allocate');
@@ -130,6 +137,8 @@ Route::middleware(['auth', 'role:admin,admin_master'])
     // Stok movement report
     Route::get('laporan/distribusi-pupuk', [ReportController::class, 'fertilizerDistribution'])->name('reports.fertilizer');
     Route::get('laporan/distribusi-pupuk/export', [ReportController::class, 'exportFertilizerDistribution'])->name('reports.fertilizer.export');
+    Route::get('laporan/statistik-pertanian', [ReportController::class, 'agricultureStatistics'])->name('reports.agriculture');
+    Route::get('laporan/statistik-pertanian/export', [ReportController::class, 'exportAgricultureStatistics'])->name('reports.agriculture.export');
     Route::get('laporan/transaksi', [ReportController::class, 'transactions'])->name('reports.transactions');
     Route::get('laporan/transaksi/export', [ReportController::class, 'exportTransactions'])->name('reports.transactions.export');
     Route::get('laporan/harga-komoditas', [ReportController::class, 'commodityPrices'])->name('reports.prices');
@@ -150,19 +159,19 @@ Route::middleware(['auth', 'role:farmer'])
 
     Route::get('/dashboard', [FarmerDashboard::class, 'index'])->name('dashboard');
 
-    // Product management
-    Route::resource('produk', FarmerProductController::class);
-    Route::patch('produk/{product}/toggle-status', [FarmerProductController::class, 'toggleStatus'])
-         ->name('produk.toggle-status');
-
-    // Orders (incoming from buyers)
-    Route::get('pesanan', [FarmerOrderController::class, 'index'])->name('orders.index');
-    Route::get('pesanan/{order}', [FarmerOrderController::class, 'show'])->name('orders.show');
-    Route::patch('pesanan/{order}/konfirmasi', [FarmerOrderController::class, 'confirm'])->name('orders.confirm');
-    Route::patch('pesanan/{order}/kirim', [FarmerOrderController::class, 'markShipped'])->name('orders.ship');
-
-    // Subsidized fertilizer
     Route::middleware('farmer.verified')->group(function () {
+        // Product management
+        Route::resource('produk', FarmerProductController::class);
+        Route::patch('produk/{product}/toggle-status', [FarmerProductController::class, 'toggleStatus'])
+             ->name('produk.toggle-status');
+
+        // Orders (incoming from buyers)
+        Route::get('pesanan', [FarmerOrderController::class, 'index'])->name('orders.index');
+        Route::get('pesanan/{order}', [FarmerOrderController::class, 'show'])->name('orders.show');
+        Route::patch('pesanan/{order}/konfirmasi', [FarmerOrderController::class, 'confirm'])->name('orders.confirm');
+        Route::patch('pesanan/{order}/kirim', [FarmerOrderController::class, 'markShipped'])->name('orders.ship');
+
+        // Subsidized fertilizer
         Route::get('pupuk-subsidi', [FarmerFertilizerController::class, 'index'])->name('fertilizer.index');
         Route::get('pupuk-subsidi/{type}/ajukan', [FarmerFertilizerController::class, 'create'])->name('fertilizer.create');
         Route::post('pupuk-subsidi', [FarmerFertilizerController::class, 'store'])->name('fertilizer.store');
@@ -186,6 +195,8 @@ Route::middleware(['auth', 'role:buyer'])
     Route::get('/dashboard', [BuyerDashboard::class, 'index'])->name('dashboard');
     Route::get('daftar-penjual', [BuyerFarmerRegistrationController::class, 'create'])->name('become-farmer.create');
     Route::post('daftar-penjual', [BuyerFarmerRegistrationController::class, 'store'])->name('become-farmer.store');
+    Route::get('daftar-distributor', [BuyerDistributorRegistrationController::class, 'create'])->name('become-distributor.create');
+    Route::post('daftar-distributor', [BuyerDistributorRegistrationController::class, 'store'])->name('become-distributor.store');
 
     // Cart
     Route::get('keranjang', [CartController::class, 'index'])->name('cart.index');

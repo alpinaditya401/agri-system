@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Buyer;
 
 use App\Http\Controllers\Controller;
 use App\Models\FarmerProfile;
+use App\Models\Notification;
 use App\Models\Role;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -96,6 +97,13 @@ class FarmerRegistrationController extends Controller
                 ]
             );
         });
+
+        Notification::sendToAdmins(
+            'alert',
+            'Pengajuan penjual/petani baru',
+            "{$user->name} mengajukan akun sebagai penjual/petani dan menunggu verifikasi.",
+            route('admin.farmers.verify.index')
+        );
 
         return redirect()
             ->route('farmer.dashboard')

@@ -23,6 +23,19 @@ class BuyerBecomeFarmerTest extends TestCase
             'display_name' => 'Petani',
         ]);
 
+        $adminRole = Role::create([
+            'name' => 'admin',
+            'display_name' => 'Admin',
+        ]);
+
+        $admin = User::create([
+            'role_id' => $adminRole->id,
+            'name' => 'Admin Verifikasi',
+            'email' => 'admin.farmer@example.com',
+            'password' => 'password',
+            'is_active' => true,
+        ]);
+
         $buyer = User::create([
             'role_id' => $buyerRole->id,
             'name' => 'Pembeli Calon Petani',
@@ -57,6 +70,28 @@ class BuyerBecomeFarmerTest extends TestCase
             'nik' => '1234567890123456',
             'main_commodity' => 'Cabai Merah',
             'verification_status' => 'pending',
+        ]);
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $admin->id,
+            'judul' => 'Pengajuan penjual/petani baru',
+        ]);
+
+        $this->actingAs($buyer)
+            ->get(route('farmer.produk.create'))
+            ->assertRedirect(route('farmer.dashboard'));
+
+        $this->actingAs($admin)
+            ->patch(route('admin.farmers.verify.approve', $buyer))
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('farmer_profiles', [
+            'user_id' => $buyer->id,
+            'verification_status' => 'verified',
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $buyer->id,
+            'judul' => 'Pengajuan penjual disetujui',
         ]);
     }
 }

@@ -41,4 +41,13 @@ class Notification extends Model
             'link'    => $link,
         ]);
     }
+
+    public static function sendToAdmins(string $tipe, string $judul, string $pesan, ?string $link = null): void
+    {
+        User::query()
+            ->whereHas('role', fn($query) => $query->whereIn('name', ['admin', 'admin_master']))
+            ->where('is_active', true)
+            ->pluck('id')
+            ->each(fn(int $userId) => self::sendToUser($userId, $tipe, $judul, $pesan, $link));
+    }
 }

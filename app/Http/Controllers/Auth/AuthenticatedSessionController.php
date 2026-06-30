@@ -35,6 +35,26 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $user = $request->user();
+
+            if ($user?->isFarmer() && $user->farmerProfile?->verification_status !== 'verified') {
+                Auth::guard('web')->logout();
+
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                $status = $user->farmerProfile?->verification_status;
+                $message = match ($status) {
+                    'pending' => 'Akun penjual/petani Anda sedang menunggu verifikasi admin. Anda baru bisa login setelah disetujui.',
+                    'rejected' => 'Akun penjual/petani Anda belum bisa login karena verifikasi ditolak. Hubungi admin untuk memperbarui data.',
+                    default => 'Akun penjual/petani Anda belum memiliki data verifikasi yang valid.',
+                };
+
+                return back()->withErrors([
+                    'email' => $message,
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             // The 'dashboard' route will handle redirecting based on the user's role

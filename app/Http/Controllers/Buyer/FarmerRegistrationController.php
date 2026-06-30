@@ -105,8 +105,13 @@ class FarmerRegistrationController extends Controller
             route('admin.farmers.verify.index')
         );
 
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect()
-            ->route('farmer.dashboard')
-            ->with('success', 'Pendaftaran sebagai penjual/petani berhasil dikirim. Profil petani Anda menunggu verifikasi admin.');
+            ->route('login')
+            ->with('status', 'Pendaftaran sebagai penjual/petani berhasil dikirim. Anda baru bisa login sebagai penjual setelah admin memverifikasi akun.');
     }
 }

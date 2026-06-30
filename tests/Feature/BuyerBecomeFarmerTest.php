@@ -60,7 +60,7 @@ class BuyerBecomeFarmerTest extends TestCase
                 'latitude' => '-7.79560000',
                 'longitude' => '110.36950000',
             ])
-            ->assertRedirect(route('farmer.dashboard'));
+            ->assertRedirect(route('login'));
 
         $buyer->refresh();
 
@@ -77,9 +77,11 @@ class BuyerBecomeFarmerTest extends TestCase
             'judul' => 'Pengajuan penjual/petani baru',
         ]);
 
-        $this->actingAs($buyer)
-            ->get(route('farmer.produk.create'))
-            ->assertRedirect(route('farmer.dashboard'));
+        $this->post(route('login'), [
+            'email' => 'buyer.to.farmer@example.com',
+            'password' => 'password',
+        ])
+            ->assertSessionHasErrors('email');
 
         $this->actingAs($admin)
             ->patch(route('admin.farmers.verify.approve', $buyer))
@@ -93,5 +95,11 @@ class BuyerBecomeFarmerTest extends TestCase
             'user_id' => $buyer->id,
             'judul' => 'Pengajuan penjual disetujui',
         ]);
+
+        $this->post(route('login'), [
+            'email' => 'buyer.to.farmer@example.com',
+            'password' => 'password',
+        ])
+            ->assertRedirect(route('dashboard'));
     }
 }

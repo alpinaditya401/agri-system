@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\FarmerProfile;
 use App\Models\DistributorProfile;
+use App\Models\Notification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -77,6 +78,19 @@ class RegisteredUserController extends Controller
             DB::commit();
 
             event(new Registered($user));
+
+            if ($role->name === 'farmer') {
+                Notification::sendToAdmins(
+                    'alert',
+                    'Pengajuan penjual/petani baru',
+                    "{$user->name} mendaftar sebagai penjual/petani dan menunggu verifikasi.",
+                    route('admin.farmers.verify.index')
+                );
+
+                return redirect()->route('login')
+                    ->with('status', 'Registrasi penjual/petani berhasil dikirim. Anda baru bisa login setelah admin memverifikasi akun.');
+            }
+
             Auth::login($user);
 
             return redirect()->route('dashboard')

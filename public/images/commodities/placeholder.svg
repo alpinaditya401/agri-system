@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder Komoditas Agrilink</title>
+  <desc id="desc">Ilustrasi sederhana untuk gambar komoditas yang belum tersedia.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ecfdf5"/>
+      <stop offset="55%" stop-color="#d9f99d"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="620" cy="120" r="78" fill="#fbbf24" opacity=".72"/>
+  <path d="M132 430c70-152 182-220 336-204 94 10 166 58 220 144-92-16-176 2-252 54-86 60-188 62-304 6Z" fill="#15803d" opacity=".88"/>
+  <path d="M206 395c54-92 136-136 246-132 70 3 126 28 168 76-70-7-134 9-190 48-66 46-140 49-224 8Z" fill="#22c55e"/>
+  <path d="M358 310c-20 74-12 136 24 186" fill="none" stroke="#14532d" stroke-width="24" stroke-linecap="round"/>
+  <text x="400" y="528" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" font-weight="700" fill="#14532d">Gambar Komoditas</text>
+</svg>

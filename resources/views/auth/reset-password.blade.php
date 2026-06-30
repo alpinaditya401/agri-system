@@ -1,0 +1,45 @@
+@extends('layouts.guest')
+
+@section('title', 'Reset Password - Agrilink')
+
+@section('content')
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-emerald-950/15 md:p-8">
+        <div class="text-center">
+            <p class="ag-label">Password Baru</p>
+            <h1 class="mt-3 text-3xl font-black text-slate-950">Buat Password Baru</h1>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Gunakan password yang kuat dan mudah kamu ingat.</p>
+        </div>
+
+        @if ($errors->any())
+            <div role="alert" class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.store') }}" class="mt-6 space-y-4">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+
+            <label class="block">
+                <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Email</span>
+                <input type="email" name="email" value="{{ old('email', $request->email) }}" required autocomplete="email" class="ag-input">
+            </label>
+
+            <label class="block">
+                <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Password Baru</span>
+                <input type="password" name="password" required autocomplete="new-password" class="ag-input">
+            </label>
+
+            <label class="block">
+                <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Konfirmasi Password</span>
+                <input type="password" name="password_confirmation" required autocomplete="new-password" class="ag-input">
+            </label>
+
+            <button type="submit" class="ag-btn-primary w-full rounded-2xl py-4" data-loading-text="Menyimpan...">
+                Simpan Password Baru
+            </button>
+        </form>
+    </div>
+@endsection

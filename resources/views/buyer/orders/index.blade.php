@@ -36,10 +36,10 @@
                             <td class="px-5 py-4 font-semibold text-slate-700">{{ $order->farmer->name ?? 'Petani' }}</td>
                             <td class="px-5 py-4 font-black text-slate-900">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
                             <td class="px-5 py-4">
-                                <x-ui.badge :tone="$order->payment_status">{{ ucfirst($order->payment_status) }}</x-ui.badge>
+                                <x-ui.badge :tone="$order->payment_status">{{ $order->payment_status_label }}</x-ui.badge>
                             </td>
                             <td class="px-5 py-4">
-                                <x-ui.badge :tone="$order->order_status">{{ ucfirst($order->order_status) }}</x-ui.badge>
+                                <x-ui.badge :tone="$order->order_status">{{ $order->order_status_label }}</x-ui.badge>
                             </td>
                             <td class="px-5 py-4 text-xs font-semibold text-slate-400">{{ $order->created_at->translatedFormat('d M Y') }}</td>
                             <td class="px-5 py-4">

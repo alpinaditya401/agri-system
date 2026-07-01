@@ -40,9 +40,40 @@
         <div class="space-y-5">
             <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                 <h2 class="font-bold text-gray-800 mb-3">Status Pesanan</h2>
-                <span class="bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-md">{{ ucfirst($order->order_status) }}</span>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="text-sm font-semibold text-gray-500">Status Pesanan</span>
+                        <x-ui.badge :tone="$order->order_status">{{ $order->order_status_label }}</x-ui.badge>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="text-sm font-semibold text-gray-500">Status Pembayaran</span>
+                        <x-ui.badge :tone="$order->payment_status">{{ $order->payment_status_label }}</x-ui.badge>
+                    </div>
+                    @if ($order->payment_method)
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-sm font-semibold text-gray-500">Metode Pembayaran</span>
+                            <span class="text-sm font-bold text-gray-800">{{ $order->payment_method }}</span>
+                        </div>
+                    @endif
+                    @if ($order->paid_at)
+                        <div class="flex items-center justify-between gap-3">
+                            <span class="text-sm font-semibold text-gray-500">Dibayar Pada</span>
+                            <span class="text-sm font-bold text-gray-800">{{ $order->paid_at->translatedFormat('d M Y, H:i') }}</span>
+                        </div>
+                    @endif
+                </div>
 
-                @if ($order->order_status === 'pending')
+                @if ($order->payment_status !== 'paid')
+                    <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold leading-5 text-amber-800">
+                        Pembayaran belum diterima. Jangan kirim pesanan sebelum pembayaran lunas.
+                    </div>
+                @else
+                    <div class="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-700">
+                        Sudah Dibayar
+                    </div>
+                @endif
+
+                @if ($order->order_status === 'pending' && $order->payment_status === 'paid')
                     <form method="POST" action="{{ route('farmer.orders.confirm', $order) }}" class="mt-4">
                         @csrf
                         @method('PATCH')
@@ -50,7 +81,7 @@
                     </form>
                 @endif
 
-                @if (in_array($order->order_status, ['confirmed', 'processing']))
+                @if (in_array($order->order_status, ['confirmed', 'processing']) && $order->payment_status === 'paid')
                     <form method="POST" action="{{ route('farmer.orders.ship', $order) }}" class="mt-4 space-y-2">
                         @csrf
                         @method('PATCH')

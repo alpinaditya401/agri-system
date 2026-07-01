@@ -42,7 +42,8 @@ class DashboardController extends Controller
             'pending_distributor_verifications' => $usersForRegion()->whereHas('distributorProfile', fn($q) => $q->where('verification_status', 'pending'))->count(),
             'total_orders'       => $ordersForRegion()->count(),
             'pending_orders'     => $ordersForRegion()->where('order_status', 'pending')->count(),
-            'fertilizer_transactions' => $fertilizerForRegion()->where('status', 'pending')->count(),
+            'total_fertilizer_transactions' => $fertilizerForRegion()->count(),
+            'pending_fertilizer_transactions' => $fertilizerForRegion()->where('status', 'pending')->count(),
             'total_articles'     => Article::count(),
         ];
 

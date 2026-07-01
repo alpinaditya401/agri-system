@@ -62,7 +62,7 @@
                             <td class="p-4 text-gray-800">{{ $order->buyer->name ?? '-' }}</td>
                             <td class="p-4 text-gray-600">{{ $order->farmer->name ?? '-' }}</td>
                             <td class="p-4 text-gray-700">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
-                            <td class="p-4"><span class="bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-md">{{ ucfirst($order->order_status) }}</span></td>
+                            <td class="p-4"><x-ui.badge :tone="$order->order_status">{{ $order->order_status_label }}</x-ui.badge></td>
                             <td class="p-4 text-gray-400 text-xs">{{ $order->created_at->translatedFormat('d M Y') }}</td>
                         </tr>
                     @empty

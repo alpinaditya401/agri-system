@@ -10,6 +10,24 @@
 
     <x-dashboard-region-filter :filters="$regionFilters ?? []" :options="$regionOptions ?? []" description="Filter pesanan berdasarkan wilayah pembeli dan sesuaikan insight harga wilayah jika tersedia." />
 
+    @php
+        $farmerProfile = auth()->user()->farmerProfile;
+        $profileIncomplete = blank($farmerProfile?->nik) || blank($farmerProfile?->farmer_group_name);
+        $hasAllocatedQuota = $quota && (int) $quota->allocated_kg > 0;
+    @endphp
+
+    @if ($profileIncomplete)
+        <div class="mb-5 rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="font-black">Lengkapi profil Anda untuk mengajukan subsidi pupuk.</p>
+                    <p class="mt-1 text-xs font-semibold text-amber-700/80">NIK dan kelompok tani membantu admin memverifikasi alokasi kuota secara tepat.</p>
+                </div>
+                <a href="{{ route('profile.edit') }}" class="ag-btn-secondary self-start bg-white px-4 py-2 text-xs text-amber-800 hover:bg-amber-100 sm:self-auto">Lengkapi Profil</a>
+            </div>
+        </div>
+    @endif
+
     <!-- QUICK ACCESS BUTTONS -->
     <div class="mb-5 flex flex-wrap gap-3">
         <a href="{{ route('public.prices') }}" class="ag-btn-secondary">
@@ -65,22 +83,29 @@
                 <svg class="w-4 h-4 text-emerald-600 absolute right-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </div>
 
-            <h3 class="font-semibold text-gray-700 text-sm mb-3">Kuota Tersisa: {{ $quota ? $quota->remaining_kg : 0 }} Kg</h3>
-            <div class="flex items-center justify-center">
-                <div class="relative w-32 h-32">
-                    <canvas id="quotaChart"></canvas>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21c0-4.75 2.5-8.25 7-10-4.75-.75-8.25.75-10.5 4.5M12 21c0-5.25-2.5-9-7-11 5-.75 8.75 1 11 5.25M12 21V9" /></svg>
-                        </span>
-                        <span class="text-xs font-semibold text-gray-600">{{ $quota && $quota->allocated_kg > 0 ? round(($quota->remaining_kg / $quota->allocated_kg) * 100) : 0 }}%</span>
+            @if ($hasAllocatedQuota)
+                <h3 class="font-semibold text-gray-700 text-sm mb-3">Kuota Tersisa: {{ $quota->remaining_kg }} Kg</h3>
+                <div class="flex items-center justify-center">
+                    <div class="relative w-32 h-32">
+                        <canvas id="quotaChart"></canvas>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21c0-4.75 2.5-8.25 7-10-4.75-.75-8.25.75-10.5 4.5M12 21c0-5.25-2.5-9-7-11 5-.75 8.75 1 11 5.25M12 21V9" /></svg>
+                            </span>
+                            <span class="text-xs font-semibold text-gray-600">{{ round(($quota->remaining_kg / $quota->allocated_kg) * 100) }}%</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="flex justify-between text-xs text-gray-500 mt-2">
-                <span>Terpakai: {{ $quota ? $quota->used_kg : 0 }} Kg</span>
-                <span>Total: {{ $quota ? $quota->allocated_kg : 0 }} Kg</span>
-            </div>
+                <div class="flex justify-between text-xs text-gray-500 mt-2">
+                    <span>Terpakai: {{ $quota->used_kg }} Kg</span>
+                    <span>Total: {{ $quota->allocated_kg }} Kg</span>
+                </div>
+            @else
+                <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-4 text-center">
+                    <p class="font-semibold text-gray-700 text-sm">Belum ada kuota dialokasikan</p>
+                    <p class="mt-1 text-xs leading-5 text-gray-500">Hubungi admin atau lengkapi profil untuk proses alokasi subsidi.</p>
+                </div>
+            @endif
         </div>
 
         <!-- Peta distribusi (real, terintegrasi dari GeoJSON) -->
@@ -162,7 +187,7 @@
                         <td class="p-3 font-medium text-emerald-700">#{{ $order->order_number }}</td>
                         <td class="p-3 text-gray-800">{{ $order->buyer->name ?? 'Pembeli' }}</td>
                         <td class="p-3 text-gray-700">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
-                        <td class="p-3"><span class="bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-md">{{ ucfirst($order->order_status) }}</span></td>
+                        <td class="p-3"><x-ui.badge :tone="$order->order_status">{{ $order->order_status_label }}</x-ui.badge></td>
                         <td class="p-3"><a href="{{ route('farmer.orders.show', $order) }}" class="text-emerald-600 hover:text-emerald-800 font-medium">Detail</a></td>
                     </tr>
                     @empty
@@ -177,11 +202,12 @@
 
     @push('scripts')
     <script>
+        @if ($hasAllocatedQuota)
         new Chart(document.getElementById('quotaChart'), {
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [{{ $quota ? $quota->remaining_kg : 0 }}, {{ $quota ? $quota->used_kg : 100 }}],
+                    data: [{{ $quota->remaining_kg }}, {{ $quota->used_kg }}],
                     backgroundColor: ['#10b981', '#e5e7eb'],
                     borderWidth: 0
                 }]
@@ -191,29 +217,42 @@
                 plugins: { legend: { display: false }, tooltip: { enabled: false } }
             }
         });
+        @endif
 
         new Chart(document.getElementById('lineChart'), {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: {!! $commodityPrices->pluck('commodity_name')->toJson() !!},
                 datasets: [
                     {
                         label: 'Harga (Rp)',
                         data: {!! $commodityPrices->pluck('price')->toJson() !!},
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16,185,129,0.1)',
-                        fill: true,
-                        tension: 0.4,
+                        borderColor: '#059669',
+                        backgroundColor: 'rgba(16,185,129,0.78)',
+                        borderRadius: 8,
                         borderWidth: 2,
-                        pointRadius: 3
                     }
                 ]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `Harga: Rp ${Number(context.parsed.y || 0).toLocaleString('id-ID')}`,
+                        },
+                    },
+                },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { font: { size: 10 } } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6' },
+                        ticks: {
+                            font: { size: 10 },
+                            callback: (value) => `Rp ${Number(value).toLocaleString('id-ID')}`,
+                        },
+                    },
                     x: { grid: { display: false }, ticks: { font: { size: 10 } } }
                 }
             }

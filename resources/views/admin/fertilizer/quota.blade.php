@@ -55,40 +55,65 @@
             <form method="POST" action="{{ route('admin.fertilizer.quota.allocate') }}" class="space-y-3">
                 @csrf
                 <div>
-                    <label class="text-xs font-semibold text-gray-500">ID Petani</label>
-                    <input type="number" name="farmer_id" required placeholder="Masukkan User ID petani"
-                           class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
-                    <p class="text-[11px] text-gray-400 mt-1">Lihat ID di halaman <a href="{{ route('admin.users.index') }}" class="text-emerald-600 underline">Manajemen Pengguna</a>.</p>
+                    <label class="text-xs font-semibold text-gray-500">Petani Terverifikasi</label>
+                    <select name="farmer_id" required class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400" @disabled($farmers->isEmpty())>
+                        <option value="">{{ $farmers->isEmpty() ? 'Belum ada petani eligible' : 'Pilih petani' }}</option>
+                        @foreach ($farmers as $farmer)
+                            <option value="{{ $farmer->id }}" @selected(old('farmer_id') == $farmer->id)>
+                                {{ $farmer->name }} — {{ $farmer->email }}
+                                @if ($farmer->farmerProfile?->nik)
+                                    · NIK {{ $farmer->farmerProfile->nik }}
+                                @endif
+                                @if ($farmer->farmerProfile?->farmer_group_name)
+                                    · {{ $farmer->farmerProfile->farmer_group_name }}
+                                @endif
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('farmer_id')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @else
+                        <p class="text-[11px] text-gray-400 mt-1">Hanya petani aktif dan terverifikasi yang bisa menerima alokasi kuota.</p>
+                    @enderror
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-500">Jenis Pupuk</label>
                     <select name="fertilizer_type_id" required class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
                         <option value="">Pilih</option>
                         @foreach ($types as $type)
-                            <option value="{{ $type->id }}">{{ $type->name }}</option>
+                            <option value="{{ $type->id }}" @selected(old('fertilizer_type_id') == $type->id)>{{ $type->name }}</option>
                         @endforeach
                     </select>
+                    @error('fertilizer_type_id')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="text-xs font-semibold text-gray-500">Musim</label>
                         <select name="season" required class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
-                            <option value="MT1">MT1</option>
-                            <option value="MT2">MT2</option>
+                            <option value="MT1" @selected(old('season', 'MT1') === 'MT1')>MT1</option>
+                            <option value="MT2" @selected(old('season') === 'MT2')>MT2</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-gray-500">Tahun</label>
-                        <input type="number" name="year" value="{{ now()->year }}" required
+                        <input type="number" name="year" value="{{ old('year', now()->year) }}" required
                                class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
                     </div>
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-500">Jumlah Alokasi (kg)</label>
-                    <input type="number" name="allocated_kg" min="1" required
+                    <input type="number" name="allocated_kg" min="1" value="{{ old('allocated_kg') }}" required
                            class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
+                    @error('allocated_kg')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">Alokasikan Kuota</button>
+                @if ($errors->has('allocate'))
+                    <div class="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">{{ $errors->first('allocate') }}</div>
+                @endif
+                <button type="submit" @disabled($farmers->isEmpty()) class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-300 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">Alokasikan Kuota</button>
             </form>
         </div>
     </div>

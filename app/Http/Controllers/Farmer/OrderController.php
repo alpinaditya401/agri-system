@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Farmer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,14 +12,29 @@ use Illuminate\View\View;
 
 class OrderController extends Controller
 {
-    public function index(): View
+    public function __construct(private readonly OrderNotificationService $orderNotifications)
     {
+    }
+
+    public function index(Request $request): View
+    {
+        $allowedStatuses = array_keys(Order::ORDER_STATUS_LABELS);
+        $status = $request->query('status');
+
+        if (!in_array($status, $allowedStatuses, true)) {
+            $status = null;
+        }
+
         $orders = Order::with('buyer')
             ->where('farmer_id', Auth::id())
+            ->when($status, fn($query) => $query->where('order_status', $status))
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('farmer.orders.index', compact('orders'));
+        $statusOptions = Order::ORDER_STATUS_LABELS;
+
+        return view('farmer.orders.index', compact('orders', 'status', 'statusOptions'));
     }
 
     public function show(Order $order): View
@@ -38,7 +54,13 @@ class OrderController extends Controller
             return back()->with('error', 'Pesanan sudah tidak dapat dikonfirmasi.');
         }
 
+        if ($order->payment_status !== 'paid') {
+            return back()->with('error', 'Pembayaran belum diterima. Jangan proses pesanan sebelum pembayaran lunas.');
+        }
+
         $order->update(['order_status' => 'confirmed']);
+
+        $this->orderNotifications->orderConfirmed($order->fresh(['buyer', 'farmer']));
 
         return back()->with('success', 'Pesanan berhasil dikonfirmasi.');
     }
@@ -55,11 +77,17 @@ class OrderController extends Controller
             return back()->with('error', 'Pesanan harus dikonfirmasi terlebih dahulu sebelum dikirim.');
         }
 
+        if ($order->payment_status !== 'paid') {
+            return back()->with('error', 'Pembayaran belum diterima. Jangan kirim pesanan sebelum pembayaran lunas.');
+        }
+
         $order->update([
             'order_status'    => 'shipped',
             'tracking_number' => $validated['tracking_number'],
             'shipped_at'      => now(),
         ]);
+
+        $this->orderNotifications->orderShipped($order->fresh(['buyer', 'farmer']));
 
         return back()->with('success', 'Pesanan berhasil ditandai sebagai dikirim.');
     }

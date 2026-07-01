@@ -10,6 +10,25 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const ORDER_STATUS_LABELS = [
+        'pending' => 'Menunggu',
+        'confirmed' => 'Dikonfirmasi',
+        'processing' => 'Diproses',
+        'shipped' => 'Dikirim',
+        'delivered' => 'Terkirim',
+        'completed' => 'Selesai',
+        'cancelled' => 'Dibatalkan',
+        'disputed' => 'Disengketakan',
+    ];
+
+    public const PAYMENT_STATUS_LABELS = [
+        'pending' => 'Menunggu Pembayaran',
+        'paid' => 'Sudah Dibayar',
+        'failed' => 'Gagal',
+        'expired' => 'Kedaluwarsa',
+        'refunded' => 'Dikembalikan',
+    ];
+
     protected $fillable = [
         'order_number', 'buyer_id', 'farmer_id',
         'subtotal', 'shipping_cost', 'tax_amount', 'total_amount',
@@ -45,5 +64,15 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getOrderStatusLabelAttribute(): string
+    {
+        return self::ORDER_STATUS_LABELS[$this->order_status] ?? ucfirst((string) $this->order_status);
+    }
+
+    public function getPaymentStatusLabelAttribute(): string
+    {
+        return self::PAYMENT_STATUS_LABELS[$this->payment_status] ?? ucfirst((string) $this->payment_status);
     }
 }

@@ -194,6 +194,7 @@ class OrderService
 
             // Dispatch events (notification to farmer, buyer receipt email, etc.)
             event(new \App\Events\OrderPaid($order));
+            app(OrderNotificationService::class)->paymentPaid($order->fresh(['buyer', 'farmer']));
 
             return $order->fresh();
 

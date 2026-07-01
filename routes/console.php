@@ -2,10 +2,16 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-use Illuminate\Support\Facades\Schedule;
-Schedule::command('bps:fetch-prices')->dailyAt('00:00');
+Schedule::command('bps:fetch-prices')
+    ->dailyAt('00:00')
+    ->withoutOverlapping();
+
+Schedule::command('fertilizer:quota-reminder')
+    ->dailyAt('07:00')
+    ->withoutOverlapping();

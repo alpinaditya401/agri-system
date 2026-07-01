@@ -11,6 +11,13 @@
         <p class="text-gray-500 text-sm">Kelola pesanan dari pembeli.</p>
     </x-slot:header>
 
+    <div class="mb-5 flex flex-wrap gap-2">
+        <a href="{{ route('farmer.orders.index') }}" class="ag-chip {{ $status ? '' : 'ag-chip-active' }}">Semua</a>
+        @foreach ($statusOptions as $value => $label)
+            <a href="{{ route('farmer.orders.index', ['status' => $value]) }}" class="ag-chip {{ $status === $value ? 'ag-chip-active' : '' }}">{{ $label }}</a>
+        @endforeach
+    </div>
+
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left">
@@ -30,7 +37,7 @@
                             <td class="p-4 font-medium text-emerald-700">#{{ $order->order_number }}</td>
                             <td class="p-4 text-gray-800">{{ $order->buyer->name ?? 'Pembeli' }}</td>
                             <td class="p-4 text-gray-700">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
-                            <td class="p-4"><span class="bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-md">{{ ucfirst($order->order_status) }}</span></td>
+                            <td class="p-4"><x-ui.badge :tone="$order->order_status">{{ $order->order_status_label }}</x-ui.badge></td>
                             <td class="p-4 text-gray-400 text-xs">{{ $order->created_at->translatedFormat('d M Y') }}</td>
                             <td class="p-4"><a href="{{ route('farmer.orders.show', $order) }}" class="text-emerald-600 hover:text-emerald-800 font-medium">Detail</a></td>
                         </tr>

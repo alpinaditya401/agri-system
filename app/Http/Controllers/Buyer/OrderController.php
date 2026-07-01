@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Buyer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderNotificationService;
 use App\Services\PaymentGatewayService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,10 @@ use Illuminate\View\View;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly PaymentGatewayService $paymentGatewayService)
+    public function __construct(
+        private readonly PaymentGatewayService $paymentGatewayService,
+        private readonly OrderNotificationService $orderNotifications,
+    )
     {
     }
 
@@ -48,6 +52,8 @@ class OrderController extends Controller
             'delivered_at'   => now(),
         ]);
 
+        $this->orderNotifications->orderCompleted($order->fresh(['buyer', 'farmer']));
+
         return back()->with('success', 'Pesanan berhasil diselesaikan. Terima kasih!');
     }
 
@@ -81,6 +87,8 @@ class OrderController extends Controller
             'order_status'   => 'cancelled',
             'payment_status' => 'failed',
         ]);
+
+        $this->orderNotifications->orderCancelled($order->fresh(['buyer', 'farmer']));
 
         return back()->with('success', 'Pesanan berhasil dibatalkan.');
     }

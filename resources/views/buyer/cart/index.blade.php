@@ -79,7 +79,10 @@
                     </div>
                     <div class="flex justify-between text-sm">
                         <span class="font-semibold text-slate-500">Ongkos kirim</span>
-                        <span class="font-black text-slate-900">Rp 0</span>
+                        <span class="text-right">
+                            <span class="block font-black text-emerald-700">Gratis</span>
+                            <span class="block text-[11px] font-semibold text-slate-400">Mode demo, belum dihitung otomatis</span>
+                        </span>
                     </div>
                     <div class="flex justify-between border-t border-slate-100 pt-4 text-lg font-black">
                         <span>Total</span>

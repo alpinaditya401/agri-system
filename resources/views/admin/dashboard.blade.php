@@ -29,10 +29,10 @@
         <div class="ag-card p-5">
             <div class="flex justify-between items-start">
                 <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">TRANSAKSI PUPUK</p>
-                <span class="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">{{ $stats['fertilizer_transactions'] ?? 0 }} Baru</span>
+                <span class="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2 py-0.5 rounded-full">{{ $stats['pending_fertilizer_transactions'] ?? 0 }} Baru</span>
             </div>
-            <p class="text-2xl font-bold text-gray-800">{{ $stats['fertilizer_transactions'] ?? 0 }}</p>
-            <p class="text-sm text-gray-500 mt-1">Permintaan Subsidi</p>
+            <p class="text-2xl font-bold text-gray-800">{{ $stats['total_fertilizer_transactions'] ?? 0 }}</p>
+            <p class="text-sm text-gray-500 mt-1">Total Permintaan Subsidi</p>
         </div>
         <div class="ag-card p-5">
             <div class="flex justify-between items-start">

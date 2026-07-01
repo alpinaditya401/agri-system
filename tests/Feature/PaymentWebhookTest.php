@@ -68,6 +68,15 @@ class PaymentWebhookTest extends TestCase
         $this->assertSame('paid', $order->payment_status);
         $this->assertSame('confirmed', $order->order_status);
         $this->assertSame('trx-valid', $order->payment_reference);
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $order->buyer_id,
+            'judul' => 'Pembayaran berhasil',
+        ]);
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $order->farmer_id,
+            'judul' => 'Pesanan sudah dibayar',
+        ]);
     }
 
     private function createPendingOrder(): Order

@@ -28,8 +28,14 @@ class FertilizerQuotaAdminController extends Controller
             ->paginate(25);
 
         $types = FertilizerType::where('is_active', true)->get();
+        $farmers = User::with('farmerProfile')
+            ->where('is_active', true)
+            ->whereHas('role', fn($query) => $query->where('name', 'farmer'))
+            ->whereHas('farmerProfile', fn($query) => $query->where('verification_status', 'verified'))
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.fertilizer.quota', compact('quotas', 'types'));
+        return view('admin.fertilizer.quota', compact('quotas', 'types', 'farmers'));
     }
 
     /**

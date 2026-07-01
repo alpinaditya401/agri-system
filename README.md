@@ -1,59 +1,192 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Agrilink / agri-system
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Agrilink adalah platform pertanian digital Indonesia untuk marketplace hasil tani, informasi harga komoditas, distribusi pupuk subsidi, peta distribusi, chat, notifikasi, dan dashboard multi-role.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Laravel 12
+- Blade
+- Tailwind CSS via Vite
+- Chart.js
+- Leaflet
+- MySQL/TiDB untuk production
+- Laravel Sanctum untuk API token
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Harga komoditas berbasis cache BPS dan data demo dashboard.
+- Marketplace hasil tani untuk pembeli dan petani.
+- Pengajuan dan distribusi pupuk bersubsidi.
+- Peta distribusi petani, produk, dan distributor.
+- Chat antar pengguna.
+- Notifikasi pengiriman, harga, stok, chat, dan status order.
+- Dashboard buyer, farmer, distributor, admin, dan admin master.
+- Upload foto profil dan gambar produk melalui storage publik.
 
-## Learning Laravel
+## Setup Lokal
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+npm run dev
+php artisan serve
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Untuk build production lokal:
 
-## Laravel Sponsors
+```bash
+npm run build
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Environment Penting
 
-### Premium Partners
+```env
+APP_NAME=Agrilink
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://domain-production-anda
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+DB_CONNECTION=mysql
+DB_HOST=host-database
+DB_PORT=4000
+DB_DATABASE=agri_system
+DB_USERNAME=username
+DB_PASSWORD=password
 
-## Contributing
+BPS_API_KEY=
+BPS_BASE_URL=https://webapi.bps.go.id/v1/api
+BPS_DOMAIN=0000
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+PAYMENT_GATEWAY=demo
+MIDTRANS_SERVER_KEY=
+MIDTRANS_CLIENT_KEY=
+MIDTRANS_IS_PRODUCTION=false
+```
 
-## Code of Conduct
+Gunakan `PAYMENT_GATEWAY=demo` untuk mode demo auto-paid. Isi Midtrans hanya jika gateway asli sudah siap.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Akun Demo
 
-## Security Vulnerabilities
+Seeder demo memakai password:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```text
+password
+```
 
-## License
+Contoh akun:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- `buyer.demo@agri.com`
+- `petani.karawang@agri.com`
+- `distributor.demo@agri.com`
+- `admin@agri.com`
+- `admin.master@agri.com`
+
+## Seeder Data Dashboard
+
+Untuk mengisi dashboard dengan data demo yang lebih lengkap:
+
+```bash
+php artisan db:seed --class=RichDashboardDataSeeder --force
+php artisan db:seed --class=BpsSourceArticleSeeder --force
+```
+
+Di Railway CLI:
+
+```bash
+railway run php artisan db:seed --class=RichDashboardDataSeeder --force
+railway run php artisan db:seed --class=BpsSourceArticleSeeder --force
+```
+
+## Scheduler
+
+Command yang dijadwalkan:
+
+- `bps:fetch-prices` setiap hari pukul `00:00`
+- `fertilizer:quota-reminder` setiap hari pukul `07:00`
+
+Cek schedule:
+
+```bash
+php artisan schedule:list
+```
+
+### Railway Scheduler
+
+Railway tidak otomatis menjalankan Laravel scheduler dari web service utama. Buat service/cron job terpisah di Railway:
+
+- Cron Schedule: `* * * * *`
+- Start Command: `php artisan schedule:run`
+- Service harus exit setelah command selesai.
+
+Jangan ganti start command web service utama menjadi scheduler, karena web service tetap harus menjalankan aplikasi.
+
+## Deployment Railway
+
+Checklist production:
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci
+npm run build
+php artisan migrate --force
+php artisan storage:link || true
+php artisan optimize
+```
+
+Setelah deploy pertama, jalankan seeder demo jika dibutuhkan:
+
+```bash
+php artisan db:seed --class=RichDashboardDataSeeder --force
+php artisan db:seed --class=BpsSourceArticleSeeder --force
+```
+
+## Storage Upload
+
+Upload foto profil dan gambar produk disimpan di disk `public`. Pastikan symbolic link tersedia:
+
+```bash
+php artisan storage:link
+```
+
+Jika gambar upload tidak tampil di production, cek:
+
+- `APP_URL` sudah benar.
+- `public/storage` sudah dibuat oleh `storage:link`.
+- Railway volume/persistent storage sudah disiapkan jika file upload harus bertahan antar deploy.
+
+## Produk Duplikat Production
+
+Jangan hapus data production otomatis. Deteksi dulu:
+
+```bash
+php artisan products:deduplicate
+```
+
+Jika hasil dry-run sudah benar dan database sudah dibackup:
+
+```bash
+php artisan products:deduplicate --apply
+```
+
+SQL audit manual:
+
+```sql
+SELECT name, farmer_id, category_id, price_per_unit, COUNT(*) AS total
+FROM products
+WHERE deleted_at IS NULL
+GROUP BY name, farmer_id, category_id, price_per_unit
+HAVING COUNT(*) > 1;
+```
+
+## Testing
+
+```bash
+php artisan route:list
+php artisan schedule:list
+php artisan test
+npm run build
+```

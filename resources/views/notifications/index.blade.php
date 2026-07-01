@@ -61,8 +61,9 @@
         const NOTIF_READ_ALL = '{{ route("api.notifications.read-all") }}';
         const NOTIF_STOCK_ALERTS = '{{ route("api.notifications.stock-alerts") }}';
         const CSRF_TOKEN = '{{ csrf_token() }}';
+        const INITIAL_FILTER = new URLSearchParams(window.location.search).get('filter') || 'all';
         let allNotif = [];
-        let currentFilter = 'all';
+        let currentFilter = ['all', 'arrived', 'price', 'low_stock', 'chat'].includes(INITIAL_FILTER) ? INITIAL_FILTER : 'all';
 
         const typeMap = {
             arrived:   { color: '#10b981', bg: 'rgba(16,185,129,.12)', icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 17H8m5-13H3a1 1 0 00-1 1v9a1 1 0 001 1h2m10-11l4 4m0 0v6h-4m0-6h-3v6h3' },
@@ -89,6 +90,7 @@
                 badge.textContent = unread;
                 badge.classList.toggle('hidden', unread === 0);
 
+                setActiveFilterButton(currentFilter);
                 renderNotif(allNotif);
                 loadStokAlerts();
             } catch (e) {
@@ -175,9 +177,13 @@
 
         function filterNotif(type) {
             currentFilter = type;
+            setActiveFilterButton(type);
+            renderNotif(allNotif);
+        }
+
+        function setActiveFilterButton(type) {
             document.querySelectorAll('.nf-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('f-' + type).classList.add('active');
-            renderNotif(allNotif);
         }
 
         function escHtml(s) {

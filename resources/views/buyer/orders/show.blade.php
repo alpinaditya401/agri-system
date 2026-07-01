@@ -25,7 +25,12 @@
                 </div>
                 <div class="mt-3 space-y-2 border-t border-slate-100 pt-4">
                     <div class="flex justify-between text-sm"><span class="font-semibold text-slate-500">Subtotal</span><span class="font-black text-slate-900">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span></div>
-                    <div class="flex justify-between text-sm"><span class="font-semibold text-slate-500">Ongkos Kirim</span><span class="font-black text-slate-900">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span></div>
+                    <div class="flex justify-between text-sm">
+                        <span class="font-semibold text-slate-500">Ongkos Kirim</span>
+                        <span class="text-right font-black text-slate-900">
+                            {{ (float) $order->shipping_cost > 0 ? 'Rp ' . number_format($order->shipping_cost, 0, ',', '.') : 'Gratis' }}
+                        </span>
+                    </div>
                     <div class="flex justify-between pt-3 text-lg font-black"><span>Total</span><span class="text-emerald-700">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span></div>
                 </div>
             </x-ui.card>
@@ -48,11 +53,11 @@
                 <div class="mt-5 space-y-3">
                     <div class="flex items-center justify-between gap-4">
                         <span class="text-sm font-semibold text-slate-500">Pesanan</span>
-                        <x-ui.badge :tone="$order->order_status">{{ ucfirst($order->order_status) }}</x-ui.badge>
+                        <x-ui.badge :tone="$order->order_status">{{ $order->order_status_label }}</x-ui.badge>
                     </div>
                     <div class="flex items-center justify-between gap-4">
                         <span class="text-sm font-semibold text-slate-500">Pembayaran</span>
-                        <x-ui.badge :tone="$order->payment_status">{{ ucfirst($order->payment_status) }}</x-ui.badge>
+                        <x-ui.badge :tone="$order->payment_status">{{ $order->payment_status_label }}</x-ui.badge>
                     </div>
                     @if ($order->payment_gateway)
                         <div class="flex items-center justify-between gap-4">

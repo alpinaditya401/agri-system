@@ -156,7 +156,7 @@
                                     <td class="p-3"><a href="{{ route('buyer.orders.show', $order) }}" class="font-black text-emerald-700">#{{ $order->order_number }}</a></td>
                                     <td class="p-3 font-semibold text-slate-700">{{ $order->farmer->name ?? 'Petani' }}</td>
                                     <td class="p-3 font-semibold text-slate-700">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
-                                    <td class="p-3"><x-ui.badge :tone="$order->order_status">{{ ucfirst($order->order_status) }}</x-ui.badge></td>
+                                    <td class="p-3"><x-ui.badge :tone="$order->order_status">{{ $order->order_status_label }}</x-ui.badge></td>
                                 </tr>
                             @empty
                                 <tr>
@@ -199,26 +199,38 @@
     @push('scripts')
     <script>
         new Chart(document.getElementById('priceChart'), {
-            type: 'line',
+            type: 'bar',
             data: {
                 labels: {!! $commodityPriceList->pluck('commodity_name')->values()->toJson() !!},
                 datasets: [{
                     label: 'Harga',
                     data: {!! $commodityPriceList->pluck('price')->values()->toJson() !!},
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16,185,129,0.12)',
-                    fill: true,
-                    tension: 0.35,
-                    borderWidth: 2,
-                    pointRadius: 3
+                    backgroundColor: 'rgba(16,185,129,0.78)',
+                    borderColor: '#059669',
+                    borderWidth: 1,
+                    borderRadius: 8
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `Harga: Rp ${Number(context.parsed.y || 0).toLocaleString('id-ID')}`,
+                        },
+                    },
+                },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { font: { size: 10 } } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6' },
+                        ticks: {
+                            font: { size: 10 },
+                            callback: (value) => `Rp ${Number(value).toLocaleString('id-ID')}`,
+                        },
+                    },
                     x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } }
                 }
             }

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             DemoAccountSeeder::class,
             DemoMapDataSeeder::class,
+            RichDashboardDataSeeder::class,
             BpsSourceArticleSeeder::class,
         ]);
     }

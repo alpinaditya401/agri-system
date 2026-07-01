@@ -46,6 +46,10 @@ class RegisterRequest extends FormRequest
             // Coordinates
             'latitude' => ['nullable', 'numeric'],
             'longitude' => ['nullable', 'numeric'],
+
+            // Distributor verification data
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'license_number' => ['nullable', 'string', 'max:255'],
         ];
     }
 

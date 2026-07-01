@@ -56,6 +56,24 @@ class AuthenticatedSessionController extends Controller
                 ])->onlyInput('email');
             }
 
+            if ($user?->isDistributor() && $user->distributorProfile?->verification_status !== 'verified') {
+                Auth::guard('web')->logout();
+
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                $status = $user->distributorProfile?->verification_status;
+                $message = match ($status) {
+                    'pending' => 'Akun distributor Anda sedang menunggu verifikasi admin. Anda baru bisa login setelah disetujui.',
+                    'rejected' => 'Akun distributor Anda belum bisa login karena verifikasi ditolak. Hubungi admin untuk memperbarui data.',
+                    default => 'Akun distributor Anda belum memiliki data verifikasi yang valid.',
+                };
+
+                return back()->withErrors([
+                    'email' => $message,
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
             $this->forgetApiIntendedUrl($request);
 

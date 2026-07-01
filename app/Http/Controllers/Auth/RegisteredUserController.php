@@ -91,6 +91,18 @@ class RegisteredUserController extends Controller
                     ->with('status', 'Registrasi penjual/petani berhasil dikirim. Anda baru bisa login setelah admin memverifikasi akun.');
             }
 
+            if ($role->name === 'distributor') {
+                Notification::sendToAdmins(
+                    'alert',
+                    'Pengajuan distributor baru',
+                    "{$user->name} mendaftar sebagai distributor dan menunggu verifikasi.",
+                    route('admin.distributors.verify.index')
+                );
+
+                return redirect()->route('login')
+                    ->with('status', 'Registrasi distributor berhasil dikirim. Anda baru bisa login setelah admin memverifikasi akun.');
+            }
+
             Auth::login($user);
 
             return redirect()->route('dashboard')

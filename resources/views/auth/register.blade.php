@@ -11,7 +11,7 @@
         <div class="text-center">
             <p class="ag-label">Buat Akun</p>
             <h1 class="mt-3 text-3xl font-black text-slate-950">Daftar Agrilink</h1>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Pilih peran dan lengkapi data dasar untuk mengakses dashboard.</p>
+            <p class="mt-2 text-sm leading-6 text-slate-500">Akun Pembeli langsung aktif. Akun Petani dan Distributor perlu verifikasi admin sebelum bisa login.</p>
         </div>
 
         <div id="rolePreview" class="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-4 text-center">
@@ -140,9 +140,9 @@
 
     <script>
         const roleCopy = {
-            farmer: ['Dashboard Petani', 'Kelola produk, pantau harga, ajukan pupuk subsidi, dan lihat pesanan masuk.'],
-            buyer: ['Dashboard Pembeli', 'Belanja hasil tani, kelola keranjang, dan pantau status pesanan.'],
-            distributor: ['Dashboard Distributor', 'Kelola stok pupuk dan proses permintaan subsidi dari petani.']
+            farmer: ['Pengajuan Akun Petani', 'Data akan dikirim ke admin. Anda baru bisa login setelah akun petani diverifikasi.'],
+            buyer: ['Dashboard Pembeli', 'Akun langsung aktif untuk belanja hasil tani, kelola keranjang, dan pantau pesanan.'],
+            distributor: ['Pengajuan Akun Distributor', 'Data akan dikirim ke admin. Anda baru bisa login setelah akun distributor diverifikasi.']
         };
 
         const roleSelect = document.getElementById('role-select');

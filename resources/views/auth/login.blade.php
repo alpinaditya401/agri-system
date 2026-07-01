@@ -10,6 +10,12 @@
             <p class="mt-2 text-sm leading-6 text-slate-500">Gunakan email dan password akun Agrilink.</p>
         </div>
 
+        @if (session('status') || session('success'))
+            <div role="status" class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold leading-6 text-emerald-800">
+                {{ session('status') ?? session('success') }}
+            </div>
+        @endif
+
         @if ($errors->any())
             <div role="alert" class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
                 @foreach ($errors->all() as $error)

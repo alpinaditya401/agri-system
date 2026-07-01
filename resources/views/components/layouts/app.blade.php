@@ -42,7 +42,7 @@
         $currentUserPhoto = $currentUser?->profile_photo_url;
         $currentUserInitial = strtoupper(substr($currentUser?->name ?? 'U', 0, 1));
     @endphp
-    <div class="md:hidden fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-emerald-950/95 px-4 py-3 text-white shadow-lg backdrop-blur-xl">
+    <div class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-emerald-950/95 px-4 py-3 text-white shadow-lg backdrop-blur-xl lg:hidden">
         <div class="flex items-center justify-between gap-3">
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
                 <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white">
@@ -61,9 +61,9 @@
         </div>
     </div>
 
-    <div id="sidebarOverlay" class="fixed inset-0 z-40 hidden bg-slate-950/60 backdrop-blur-sm md:hidden"></div>
+    <div id="sidebarOverlay" class="fixed inset-0 z-40 hidden bg-slate-950/60 backdrop-blur-sm lg:hidden"></div>
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-hidden border-r border-white/10 bg-emerald-950 text-white shadow-2xl shadow-emerald-950/30 transition-transform duration-300 md:translate-x-0">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-hidden border-r border-white/10 bg-emerald-950 text-white shadow-2xl shadow-emerald-950/30 transition-transform duration-300 lg:translate-x-0">
         <div class="relative flex min-h-20 items-center gap-3 border-b border-white/10 px-5">
             <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-sm">
                 <img src="{{ asset('images/agrilink_logo.webp') }}" alt="Logo Agrilink" class="h-8 w-8 object-contain" onerror="this.style.display='none'">
@@ -72,7 +72,7 @@
                 <p class="text-lg font-black leading-none">Agrilink</p>
                 <p class="mt-1 text-xs font-semibold text-emerald-100/70">Platform Agritech Indonesia</p>
             </div>
-            <button id="mobileCloseBtn" type="button" class="ml-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-emerald-50 md:hidden" aria-label="Tutup menu">
+            <button id="mobileCloseBtn" type="button" class="ml-auto flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-emerald-50 lg:hidden" aria-label="Tutup menu">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
                 </svg>
@@ -129,13 +129,13 @@
         </div>
     </aside>
 
-    <main class="min-h-screen w-full px-4 pb-10 pt-24 md:ml-72 md:w-[calc(100%-18rem)] md:px-6 md:pt-6 lg:px-8">
+    <main class="min-h-screen w-full px-4 pb-10 pt-24 md:px-6 lg:pl-80 lg:pr-8 lg:pt-6">
         <div class="mx-auto w-full max-w-[1500px]">
             <div class="mb-6 flex flex-col gap-4 rounded-3xl border border-white/70 bg-white/80 p-4 shadow-sm backdrop-blur-xl md:flex-row md:items-center md:justify-between md:px-5">
                 <div class="min-w-0">
                     {{ $header ?? '' }}
                 </div>
-                <div class="hidden items-center gap-3 md:flex">
+                <div class="hidden items-center gap-3 lg:flex">
                     @include('components.notification-bell')
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:bg-slate-50">
                         @if ($currentUserPhoto)

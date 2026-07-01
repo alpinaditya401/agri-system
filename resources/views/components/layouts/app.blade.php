@@ -190,7 +190,9 @@
 
         async function pollNotifSummary() {
             try {
-                const res = await fetch('{{ route("api.notifications.summary") }}');
+                const res = await fetch('{{ route("api.notifications.summary") }}', {
+                    headers: { 'Accept': 'application/json' },
+                });
                 const json = await res.json();
                 if (json.status !== 'success') return;
 

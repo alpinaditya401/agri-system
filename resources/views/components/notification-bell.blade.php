@@ -44,7 +44,9 @@
     async function loadBellNotif(list) {
         if (!list) return;
         try {
-            const res = await fetch('{{ route("api.notifications.summary") }}');
+            const res = await fetch('{{ route("api.notifications.summary") }}', {
+                headers: { 'Accept': 'application/json' },
+            });
             const json = await res.json();
             if (json.status !== 'success' || !json.recent?.length) {
                 list.innerHTML = '<p class="py-6 text-center text-xs font-semibold text-slate-400">Belum ada notifikasi</p>';

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -56,6 +57,7 @@ class AuthenticatedSessionController extends Controller
             }
 
             $request->session()->regenerate();
+            $this->forgetApiIntendedUrl($request);
 
             // The 'dashboard' route will handle redirecting based on the user's role
             return redirect()->intended(route('dashboard'));
@@ -78,5 +80,15 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    private function forgetApiIntendedUrl(Request $request): void
+    {
+        $intended = (string) $request->session()->get('url.intended', '');
+        $path = (string) parse_url($intended, PHP_URL_PATH);
+
+        if (Str::startsWith(ltrim($path, '/'), 'api/')) {
+            $request->session()->forget('url.intended');
+        }
     }
 }

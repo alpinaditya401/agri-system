@@ -7,7 +7,7 @@
         $roleOptions = collect($roles ?? []);
     @endphp
 
-    <div class="mx-auto max-w-3xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-emerald-950/15 md:p-8">
+    <div class="mx-auto max-w-3xl rounded-[2rem] border border-white/20 bg-white/95 p-6 shadow-2xl shadow-emerald-950/25 md:p-8">
         <div class="text-center">
             <p class="ag-label">Buat Akun</p>
             <h1 class="mt-3 text-3xl font-black text-slate-950">Daftar Agrilink</h1>

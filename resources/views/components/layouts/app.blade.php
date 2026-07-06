@@ -148,20 +148,29 @@
                 </div>
             </div>
 
-            @if (session('success'))
-                <div class="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 shadow-sm">{{ session('success') }}</div>
+            @if (session('success') || session('status'))
+                <x-ui.alert type="success" class="mb-5">
+                    {{ session('success') ?? session('status') }}
+                </x-ui.alert>
+            @endif
+            @if (session('warning'))
+                <x-ui.alert type="warning" class="mb-5">
+                    {{ session('warning') }}
+                </x-ui.alert>
             @endif
             @if (session('error'))
-                <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm">{{ session('error') }}</div>
+                <x-ui.alert type="danger" class="mb-5">
+                    {{ session('error') }}
+                </x-ui.alert>
             @endif
             @if ($errors->any())
-                <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm">
+                <x-ui.alert type="danger" title="Periksa input" class="mb-5">
                     <ul class="list-inside list-disc space-y-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>
+                </x-ui.alert>
             @endif
 
             {{ $slot }}

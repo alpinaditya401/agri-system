@@ -11,24 +11,25 @@
         </div>
 
         @if (session('status'))
-            <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-700">
+            <x-ui.alert type="success" class="mt-6">
                 {{ session('status') }}
-            </div>
+            </x-ui.alert>
         @endif
 
         @if ($errors->any())
-            <div role="alert" class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
+            <x-ui.alert type="danger" title="Reset password gagal" class="mt-6">
                 @foreach ($errors->all() as $error)
                     <p>{{ $error }}</p>
                 @endforeach
-            </div>
+            </x-ui.alert>
         @endif
 
         <form method="POST" action="{{ route('password.email') }}" class="mt-6 space-y-4">
             @csrf
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Email</span>
-                <input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="nama@email.com" class="ag-input">
+                <input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="nama@email.com" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" class="ag-input @error('email') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                <x-ui.field-error name="email" />
             </label>
 
             <button type="submit" class="ag-btn-primary w-full rounded-2xl py-4" data-loading-text="Mengirim...">

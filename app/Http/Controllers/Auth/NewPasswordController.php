@@ -34,6 +34,12 @@ class NewPasswordController extends Controller
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', PasswordRule::defaults()],
+        ], [
+            'token.required' => 'Token reset password tidak valid.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password baru wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
         ]);
 
         $status = Password::reset(
@@ -49,7 +55,17 @@ class NewPasswordController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('status', __($status))
-            : back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
+            ? redirect()->route('login')->with('status', $this->statusMessage($status))
+            : back()->withInput($request->only('email'))->withErrors(['email' => $this->statusMessage($status)]);
+    }
+
+    private function statusMessage(string $status): string
+    {
+        return match ($status) {
+            Password::PASSWORD_RESET => 'Password berhasil diperbarui. Silakan login dengan password baru.',
+            Password::INVALID_TOKEN => 'Token reset password tidak valid atau sudah kedaluwarsa.',
+            Password::INVALID_USER => 'Email tidak ditemukan di sistem Agrilink.',
+            default => 'Password belum bisa diperbarui. Coba ulangi dari link reset password.',
+        };
     }
 }

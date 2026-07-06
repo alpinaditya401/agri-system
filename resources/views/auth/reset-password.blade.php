@@ -11,11 +11,11 @@
         </div>
 
         @if ($errors->any())
-            <div role="alert" class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
+            <x-ui.alert type="danger" title="Password belum tersimpan" class="mt-6">
                 @foreach ($errors->all() as $error)
                     <p>{{ $error }}</p>
                 @endforeach
-            </div>
+            </x-ui.alert>
         @endif
 
         <form method="POST" action="{{ route('password.store') }}" class="mt-6 space-y-4">
@@ -24,17 +24,20 @@
 
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Email</span>
-                <input type="email" name="email" value="{{ old('email', $request->email) }}" required autocomplete="email" class="ag-input">
+                <input type="email" name="email" value="{{ old('email', $request->email) }}" required autocomplete="email" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" class="ag-input @error('email') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                <x-ui.field-error name="email" />
             </label>
 
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Password Baru</span>
-                <input type="password" name="password" required autocomplete="new-password" class="ag-input">
+                <input type="password" name="password" required autocomplete="new-password" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" class="ag-input @error('password') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                <x-ui.field-error name="password" />
             </label>
 
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Konfirmasi Password</span>
-                <input type="password" name="password_confirmation" required autocomplete="new-password" class="ag-input">
+                <input type="password" name="password_confirmation" required autocomplete="new-password" aria-invalid="{{ $errors->has('password_confirmation') ? 'true' : 'false' }}" class="ag-input @error('password_confirmation') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                <x-ui.field-error name="password_confirmation" />
             </label>
 
             <button type="submit" class="ag-btn-primary w-full rounded-2xl py-4" data-loading-text="Menyimpan...">

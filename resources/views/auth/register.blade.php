@@ -21,11 +21,11 @@
         </div>
 
         @if ($errors->any())
-            <div role="alert" class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
+            <x-ui.alert type="danger" title="Registrasi belum berhasil" class="mt-6">
                 @foreach ($errors->all() as $error)
                     <p>{{ $error }}</p>
                 @endforeach
-            </div>
+            </x-ui.alert>
         @endif
 
         <form method="POST" action="{{ route('register') }}" class="mt-6 space-y-5">
@@ -36,7 +36,7 @@
                 <div class="mt-4 grid gap-4">
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Jenis Akun</span>
-                        <select name="role" id="role-select" required class="ag-select">
+                        <select name="role" id="role-select" required aria-invalid="{{ $errors->has('role') ? 'true' : 'false' }}" class="ag-select @error('role') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
                             <option value="" disabled {{ old('role') ? '' : 'selected' }}>Pilih jenis akun</option>
                             @if($roleOptions->isNotEmpty())
                                 @foreach($roleOptions as $role)
@@ -48,27 +48,32 @@
                                 <option value="distributor" {{ old('role') == 'distributor' ? 'selected' : '' }}>Distributor</option>
                             @endif
                         </select>
+                        <x-ui.field-error name="role" />
                     </label>
 
                     <div class="grid gap-4 sm:grid-cols-2">
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Email</span>
-                            <input type="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="nama@email.com" class="ag-input">
+                            <input type="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="nama@email.com" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" class="ag-input @error('email') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                            <x-ui.field-error name="email" />
                         </label>
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">No. HP</span>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" autocomplete="tel" placeholder="08xxxxxxxxxx" class="ag-input">
+                            <input type="tel" name="phone" value="{{ old('phone') }}" autocomplete="tel" placeholder="08xxxxxxxxxx" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" class="ag-input @error('phone') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                            <x-ui.field-error name="phone" />
                         </label>
                     </div>
 
                     <div class="grid gap-4 sm:grid-cols-2">
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Password</span>
-                            <input type="password" name="password" id="regPassword" required autocomplete="new-password" placeholder="Minimal 8 karakter" class="ag-input">
+                            <input type="password" name="password" id="regPassword" required autocomplete="new-password" placeholder="Minimal 8 karakter" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" class="ag-input @error('password') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                            <x-ui.field-error name="password" />
                         </label>
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Konfirmasi Password</span>
-                            <input type="password" name="password_confirmation" id="regPasswordConfirmation" required autocomplete="new-password" placeholder="Ulangi password" class="ag-input">
+                            <input type="password" name="password_confirmation" id="regPasswordConfirmation" required autocomplete="new-password" placeholder="Ulangi password" aria-invalid="{{ $errors->has('password_confirmation') ? 'true' : 'false' }}" class="ag-input @error('password_confirmation') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                            <x-ui.field-error name="password_confirmation" />
                         </label>
                     </div>
                 </div>
@@ -78,7 +83,8 @@
                 <h2 class="text-sm font-black uppercase text-slate-700">Data Pribadi</h2>
                 <label class="mt-4 block">
                     <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Nama Lengkap</span>
-                    <input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Nama sesuai identitas" class="ag-input">
+                    <input type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Nama sesuai identitas" aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}" class="ag-input @error('name') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                    <x-ui.field-error name="name" />
                 </label>
             </section>
 
@@ -88,11 +94,13 @@
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Latitude</span>
-                        <input type="number" step="any" name="latitude" value="{{ old('latitude') }}" placeholder="-6.200000" class="ag-input">
+                        <input type="number" step="any" name="latitude" value="{{ old('latitude') }}" placeholder="-6.200000" data-location-required {{ in_array(old('role'), ['farmer', 'distributor'], true) ? 'required' : '' }} aria-invalid="{{ $errors->has('latitude') ? 'true' : 'false' }}" class="ag-input @error('latitude') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <x-ui.field-error name="latitude" />
                     </label>
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Longitude</span>
-                        <input type="number" step="any" name="longitude" value="{{ old('longitude') }}" placeholder="106.816666" class="ag-input">
+                        <input type="number" step="any" name="longitude" value="{{ old('longitude') }}" placeholder="106.816666" data-location-required {{ in_array(old('role'), ['farmer', 'distributor'], true) ? 'required' : '' }} aria-invalid="{{ $errors->has('longitude') ? 'true' : 'false' }}" class="ag-input @error('longitude') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <x-ui.field-error name="longitude" />
                     </label>
                 </div>
             </section>
@@ -103,11 +111,13 @@
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-emerald-800">NIK</span>
-                        <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" pattern="[0-9]{16}" autocomplete="off" placeholder="16 digit" data-farmer-required {{ old('role') == 'farmer' ? 'required' : '' }} class="ag-input">
+                        <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" pattern="[0-9]{16}" autocomplete="off" placeholder="16 digit" data-farmer-required {{ old('role') == 'farmer' ? 'required' : '' }} aria-invalid="{{ $errors->has('nik') ? 'true' : 'false' }}" class="ag-input @error('nik') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <x-ui.field-error name="nik" />
                     </label>
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-emerald-800">ID Kelompok Tani</span>
-                        <input type="text" name="farmer_group_id" value="{{ old('farmer_group_id') }}" autocomplete="off" placeholder="Opsional" class="ag-input">
+                        <input type="text" name="farmer_group_id" value="{{ old('farmer_group_id') }}" autocomplete="off" placeholder="Opsional" aria-invalid="{{ $errors->has('farmer_group_id') ? 'true' : 'false' }}" class="ag-input @error('farmer_group_id') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <x-ui.field-error name="farmer_group_id" />
                     </label>
                 </div>
             </section>
@@ -118,11 +128,13 @@
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-sky-800">Nama Perusahaan</span>
-                        <input type="text" name="company_name" value="{{ old('company_name') }}" placeholder="Contoh: CV Pupuk Tani" class="ag-input">
+                        <input type="text" name="company_name" value="{{ old('company_name') }}" placeholder="Contoh: CV Pupuk Tani" data-distributor-required {{ old('role') == 'distributor' ? 'required' : '' }} aria-invalid="{{ $errors->has('company_name') ? 'true' : 'false' }}" class="ag-input @error('company_name') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <x-ui.field-error name="company_name" />
                     </label>
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-sky-800">Nomor Izin</span>
-                        <input type="text" name="license_number" value="{{ old('license_number') }}" placeholder="Nomor izin distributor" class="ag-input">
+                        <input type="text" name="license_number" value="{{ old('license_number') }}" placeholder="Nomor izin distributor" aria-invalid="{{ $errors->has('license_number') ? 'true' : 'false' }}" class="ag-input @error('license_number') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <x-ui.field-error name="license_number" />
                     </label>
                 </div>
             </section>
@@ -159,6 +171,12 @@
             distributorFields?.classList.toggle('hidden', !isDistributor);
             farmerFields?.querySelectorAll('[data-farmer-required]').forEach((input) => {
                 input.required = isFarmer;
+            });
+            document.querySelectorAll('[data-location-required]').forEach((input) => {
+                input.required = isFarmer || isDistributor;
+            });
+            distributorFields?.querySelectorAll('[data-distributor-required]').forEach((input) => {
+                input.required = isDistributor;
             });
 
             const copy = roleCopy[role] || ['Pilih jenis akun', 'Setiap role membuka dashboard dan workflow yang berbeda.'];

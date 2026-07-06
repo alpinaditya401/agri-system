@@ -11,34 +11,36 @@
         </div>
 
         @if (session('status') || session('success'))
-            <div role="status" class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold leading-6 text-emerald-800">
+            <x-ui.alert type="success" class="mt-6">
                 {{ session('status') ?? session('success') }}
-            </div>
+            </x-ui.alert>
         @endif
 
         @if ($errors->any())
-            <div role="alert" class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
+            <x-ui.alert type="danger" title="Login gagal" class="mt-6">
                 @foreach ($errors->all() as $error)
                     <p>{{ $error }}</p>
                 @endforeach
-            </div>
+            </x-ui.alert>
         @endif
 
         <form method="POST" action="{{ route('login') }}" class="mt-6 space-y-4">
             @csrf
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Email</span>
-                <input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="nama@email.com" class="ag-input">
+                <input type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="nama@email.com" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" class="ag-input @error('email') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                <x-ui.field-error name="email" />
             </label>
 
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Password</span>
                 <div class="relative">
-                    <input type="password" name="password" id="passInput" required autocomplete="current-password" placeholder="Masukkan password" class="ag-input pr-12">
+                    <input type="password" name="password" id="passInput" required autocomplete="current-password" placeholder="Masukkan password" aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}" class="ag-input pr-12 @error('password') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
                     <button type="button" onclick="togglePass('passInput')" aria-label="Tampilkan atau sembunyikan password" class="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-emerald-700">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.5 12S5.5 5 12 5s9.5 7 9.5 7-3 7-9.5 7-9.5-7-9.5-7Z" /><circle cx="12" cy="12" r="3" stroke-width="2" /></svg>
                     </button>
                 </div>
+                <x-ui.field-error name="password" />
             </label>
 
             <div class="flex items-center justify-between gap-3 text-sm">

@@ -12,7 +12,14 @@
     <main class="pt-20">
         <article class="ag-container max-w-5xl py-10">
             @php
-                $coverImage = $article->cover_image ?: 'images/articles/distribusi-pertanian.webp';
+                $fallbackCovers = [
+                    'harga' => 'images/commodities/cabai-merah.webp',
+                    'marketplace' => 'images/landing/petani.webp',
+                    'pupuk' => 'images/landing/sawah.webp',
+                    'edukasi' => 'images/commodities/gabah.webp',
+                    'distribusi' => 'images/articles/distribusi-pertanian.webp',
+                ];
+                $coverImage = $article->cover_image ?: ($fallbackCovers[$article->category] ?? 'images/articles/distribusi-pertanian.webp');
                 $webpCover = preg_replace('/\.(png|jpe?g)$/i', '.webp', $coverImage);
                 if ($webpCover && file_exists(public_path($webpCover))) {
                     $coverImage = $webpCover;

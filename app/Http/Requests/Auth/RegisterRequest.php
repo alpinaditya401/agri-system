@@ -27,9 +27,14 @@ class RegisterRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', Rule::in(['farmer', 'buyer', 'distributor'])],
+            'address' => ['nullable', 'string', 'max:500'],
+            'province' => [Rule::requiredIf(in_array($role, ['farmer', 'distributor'], true)), 'nullable', 'string', 'max:100'],
+            'district' => [Rule::requiredIf(in_array($role, ['farmer', 'distributor'], true)), 'nullable', 'string', 'max:100'],
+            'sub_district' => [Rule::requiredIf(in_array($role, ['farmer', 'distributor'], true)), 'nullable', 'string', 'max:100'],
+            'village' => [Rule::requiredIf(in_array($role, ['farmer', 'distributor'], true)), 'nullable', 'string', 'max:100'],
             
             // Custom validation logic for Farmers
             // NIK must be 16 digits and unique in the farmer_profiles table
@@ -45,9 +50,8 @@ class RegisterRequest extends FormRequest
             // but the prompt says NIK or Group ID, let's just make them required_if:role,farmer or nullable)
             'farmer_group_id' => ['nullable', 'string'],
             
-            // Coordinates
-            'latitude' => [Rule::requiredIf(in_array($role, ['farmer', 'distributor'], true)), 'nullable', 'numeric', 'between:-90,90'],
-            'longitude' => [Rule::requiredIf(in_array($role, ['farmer', 'distributor'], true)), 'nullable', 'numeric', 'between:-180,180'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
 
             // Distributor verification data
             'company_name' => [Rule::requiredIf($role === 'distributor'), 'nullable', 'string', 'max:255'],
@@ -73,18 +77,25 @@ class RegisterRequest extends FormRequest
             'email.email' => 'Format email tidak valid.',
             'email.max' => 'Email maksimal 255 karakter.',
             'email.unique' => 'Email sudah digunakan.',
-            'phone.max' => 'Nomor HP maksimal 20 karakter.',
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
             'password.required' => 'Password wajib diisi.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'password.min' => 'Password minimal 8 karakter.',
             'role.required' => 'Jenis akun wajib dipilih.',
             'nik.required_if' => 'NIK wajib diisi jika mendaftar sebagai petani.',
-            'latitude.numeric' => 'Latitude harus berupa angka.',
-            'latitude.required' => 'Latitude wajib diisi untuk akun petani atau distributor.',
-            'latitude.between' => 'Latitude harus berada di antara -90 sampai 90.',
-            'longitude.numeric' => 'Longitude harus berupa angka.',
-            'longitude.required' => 'Longitude wajib diisi untuk akun petani atau distributor.',
-            'longitude.between' => 'Longitude harus berada di antara -180 sampai 180.',
+            'address.max' => 'Alamat detail maksimal 500 karakter.',
+            'province.required' => 'Provinsi wajib dipilih untuk akun petani atau distributor.',
+            'province.max' => 'Provinsi maksimal 100 karakter.',
+            'district.required' => 'Kabupaten/Kota wajib dipilih untuk akun petani atau distributor.',
+            'district.max' => 'Kabupaten/Kota maksimal 100 karakter.',
+            'sub_district.required' => 'Kecamatan wajib dipilih untuk akun petani atau distributor.',
+            'sub_district.max' => 'Kecamatan maksimal 100 karakter.',
+            'village.required' => 'Desa/Kelurahan wajib dipilih untuk akun petani atau distributor.',
+            'village.max' => 'Desa/Kelurahan maksimal 100 karakter.',
+            'latitude.numeric' => 'Titik lokasi tidak valid.',
+            'latitude.between' => 'Titik lokasi tidak valid.',
+            'longitude.numeric' => 'Titik lokasi tidak valid.',
+            'longitude.between' => 'Titik lokasi tidak valid.',
             'company_name.required' => 'Nama perusahaan wajib diisi jika mendaftar sebagai distributor.',
             'company_name.max' => 'Nama perusahaan maksimal 255 karakter.',
             'license_number.max' => 'Nomor izin maksimal 255 karakter.',
@@ -99,6 +110,13 @@ class RegisterRequest extends FormRequest
         if ($this->has('email')) {
             $this->merge([
                 'email' => strtolower(trim((string) $this->input('email'))),
+            ]);
+        }
+
+        if ($this->has('phone')) {
+            $phone = trim((string) $this->input('phone'));
+            $this->merge([
+                'phone' => $phone === '' ? null : $phone,
             ]);
         }
 

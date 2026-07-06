@@ -30,7 +30,7 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('tipe', ['arrived', 'price', 'low_stock', 'chat', 'info', 'alert'])->default('info');
+            $table->enum('tipe', ['arrived', 'pengiriman', 'price', 'low_stock', 'stok', 'chat', 'info', 'alert'])->default('info');
             $table->string('judul');
             $table->text('pesan');
             $table->string('link')->nullable();

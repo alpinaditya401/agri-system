@@ -60,6 +60,17 @@ class OrderService
 
             DB::commit();
 
+            foreach ($orders as $order) {
+                try {
+                    app(OrderNotificationService::class)->orderCreated($order->fresh(['buyer', 'farmer']));
+                } catch (\Throwable $notificationError) {
+                    Log::warning('Order creation notification failed', [
+                        'order_id' => $order->id,
+                        'error' => $notificationError->getMessage(),
+                    ]);
+                }
+            }
+
             // Return first order (or return collection for multi-seller checkout)
             return $orders[0];
 
@@ -184,7 +195,6 @@ class OrderService
             // ── Update order status ───────────────────────────────────────────
             $order->update([
                 'payment_status'    => 'paid',
-                'order_status'      => 'confirmed',
                 'payment_method'    => $method,
                 'payment_reference' => $paymentReference,
                 'paid_at'           => now(),

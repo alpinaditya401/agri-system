@@ -30,6 +30,11 @@ class FarmerRegistrationController extends Controller
 
         $existingProfile = $user->farmerProfile;
 
+        if ($request->has('phone')) {
+            $phone = trim((string) $request->input('phone'));
+            $request->merge(['phone' => $phone === '' ? null : $phone]);
+        }
+
         $validated = $request->validate([
             'nik' => [
                 'nullable',
@@ -42,23 +47,27 @@ class FarmerRegistrationController extends Controller
             'farmer_group_name' => ['nullable', 'string', 'max:255'],
             'land_area_hectares' => ['required', 'numeric', 'min:0.01', 'max:9999.99'],
             'main_commodity' => ['required', 'string', 'max:100'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'address' => ['nullable', 'string', 'max:500'],
-            'province' => ['nullable', 'string', 'max:100'],
+            'province' => ['required', 'string', 'max:100'],
             'district' => ['required', 'string', 'max:100'],
-            'sub_district' => ['nullable', 'string', 'max:100'],
-            'village' => ['nullable', 'string', 'max:100'],
-            'latitude' => ['required', 'numeric', 'between:-90,90'],
-            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'sub_district' => ['required', 'string', 'max:100'],
+            'village' => ['required', 'string', 'max:100'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ], [
             'nik.size' => 'NIK harus berjumlah tepat 16 digit.',
             'nik.regex' => 'NIK hanya boleh berisi angka.',
             'nik.unique' => 'NIK ini sudah digunakan akun lain.',
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
             'land_area_hectares.required' => 'Luas lahan wajib diisi.',
             'main_commodity.required' => 'Komoditas utama wajib diisi.',
+            'province.required' => 'Provinsi lahan wajib dipilih.',
             'district.required' => 'Kabupaten/Kota wajib diisi.',
-            'latitude.required' => 'Latitude lahan wajib diisi.',
-            'longitude.required' => 'Longitude lahan wajib diisi.',
+            'sub_district.required' => 'Kecamatan lahan wajib dipilih.',
+            'village.required' => 'Desa/Kelurahan lahan wajib dipilih.',
+            'latitude.numeric' => 'Titik lokasi lahan tidak valid.',
+            'longitude.numeric' => 'Titik lokasi lahan tidak valid.',
         ]);
 
         if (blank($validated['nik'] ?? null) && blank($validated['farmer_group_id'] ?? null)) {
@@ -74,12 +83,12 @@ class FarmerRegistrationController extends Controller
                 'role_id' => $farmerRole->id,
                 'phone' => $validated['phone'] ?? $user->phone,
                 'address' => $validated['address'] ?? $user->address,
-                'province' => $validated['province'] ?? $user->province,
+                'province' => $validated['province'],
                 'district' => $validated['district'],
-                'sub_district' => $validated['sub_district'] ?? $user->sub_district,
-                'village' => $validated['village'] ?? $user->village,
-                'latitude' => $validated['latitude'],
-                'longitude' => $validated['longitude'],
+                'sub_district' => $validated['sub_district'],
+                'village' => $validated['village'],
+                'latitude' => $validated['latitude'] ?? $user->latitude,
+                'longitude' => $validated['longitude'] ?? $user->longitude,
             ]);
 
             FarmerProfile::updateOrCreate(

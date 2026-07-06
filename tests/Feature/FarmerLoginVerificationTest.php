@@ -76,7 +76,10 @@ class FarmerLoginVerificationTest extends TestCase
             'nik' => '3202020202020202',
             'land_area_hectares' => 2.25,
             'main_commodity' => 'Padi',
+            'province' => 'DI Yogyakarta',
             'district' => 'Sleman',
+            'sub_district' => 'Depok',
+            'village' => 'Caturtunggal',
             'latitude' => '-7.79560000',
             'longitude' => '110.36950000',
         ])

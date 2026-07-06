@@ -18,12 +18,21 @@ class AuthController extends Controller
                 'email' => strtolower(trim((string) $request->input('email'))),
             ]);
         }
+        if ($request->has('phone')) {
+            $phone = trim((string) $request->input('phone'));
+            $request->merge([
+                'phone' => $phone === '' ? null : $phone,
+            ]);
+        }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['nullable', Rule::in(['farmer', 'buyer', 'distributor'])],
+        ], [
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
         ]);
 
         $role = Role::where('name', $validated['role'] ?? 'farmer')->firstOrFail();
@@ -32,6 +41,7 @@ class AuthController extends Controller
             'role_id' => $role->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'is_active' => true,
         ]);

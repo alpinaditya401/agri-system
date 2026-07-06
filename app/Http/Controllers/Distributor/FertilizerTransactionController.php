@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Distributor;
 use App\Http\Controllers\Controller;
 use App\Models\FertilizerStock;
 use App\Models\FertilizerTransaction;
+use App\Models\Notification;
 use App\Services\FertilizerQuotaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -69,6 +70,14 @@ class FertilizerTransactionController extends Controller
             'processed_by' => Auth::id(),
         ]);
 
+        Notification::sendToUser(
+            userId: $transaction->farmer_id,
+            tipe: 'info',
+            judul: 'Pengajuan pupuk disetujui',
+            pesan: "Permintaan {$transaction->transaction_number} disetujui sebanyak {$approvedKg} kg. Pantau status penyerahan dari halaman riwayat pupuk.",
+            link: route('farmer.fertilizer.transactions.show', $transaction),
+        );
+
         return back()->with('success', 'Permintaan pupuk berhasil disetujui.');
     }
 
@@ -98,6 +107,14 @@ class FertilizerTransactionController extends Controller
             'rejection_reason' => $validated['rejection_reason'],
             'processed_by'     => Auth::id(),
         ]);
+
+        Notification::sendToUser(
+            userId: $transaction->farmer_id,
+            tipe: 'alert',
+            judul: 'Pengajuan pupuk ditolak',
+            pesan: "Permintaan {$transaction->transaction_number} ditolak. Alasan: {$validated['rejection_reason']}",
+            link: route('farmer.fertilizer.transactions.show', $transaction),
+        );
 
         return back()->with('success', 'Permintaan pupuk ditolak.');
     }
@@ -130,6 +147,14 @@ class FertilizerTransactionController extends Controller
             'dispensed_at' => now(),
             'processed_by' => Auth::id(),
         ]);
+
+        Notification::sendToUser(
+            userId: $transaction->farmer_id,
+            tipe: 'pengiriman',
+            judul: 'Pupuk diserahkan',
+            pesan: "Pupuk untuk transaksi {$transaction->transaction_number} sudah ditandai diserahkan oleh distributor.",
+            link: route('farmer.fertilizer.transactions.show', $transaction),
+        );
 
         return back()->with('success', 'Pupuk berhasil diserahkan ke petani.');
     }

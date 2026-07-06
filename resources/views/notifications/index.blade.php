@@ -16,9 +16,9 @@
     <div class="mb-5 flex flex-col justify-between gap-3 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center">
         <div class="flex gap-2 flex-wrap">
             <button onclick="filterNotif('all')" id="f-all" class="nf-btn active">Semua</button>
-            <button onclick="filterNotif('arrived')" id="f-arrived" class="nf-btn">Pengiriman</button>
+            <button onclick="filterNotif('pengiriman')" id="f-pengiriman" class="nf-btn">Pengiriman</button>
             <button onclick="filterNotif('price')" id="f-price" class="nf-btn">Harga</button>
-            <button onclick="filterNotif('low_stock')" id="f-low_stock" class="nf-btn">Stok</button>
+            <button onclick="filterNotif('stok')" id="f-stok" class="nf-btn">Stok</button>
             <button onclick="filterNotif('chat')" id="f-chat" class="nf-btn">Chat</button>
         </div>
         <button onclick="markAll()" class="ag-btn-secondary self-start px-4 py-2 text-xs md:self-auto">
@@ -63,11 +63,21 @@
         const CSRF_TOKEN = '{{ csrf_token() }}';
         const INITIAL_FILTER = new URLSearchParams(window.location.search).get('filter') || 'all';
         let allNotif = [];
-        let currentFilter = ['all', 'arrived', 'price', 'low_stock', 'chat'].includes(INITIAL_FILTER) ? INITIAL_FILTER : 'all';
+        const filterAliases = { arrived: 'pengiriman', low_stock: 'stok' };
+        const filterGroups = {
+            all: ['all'],
+            pengiriman: ['pengiriman', 'arrived'],
+            price: ['price'],
+            stok: ['stok', 'low_stock'],
+            chat: ['chat'],
+        };
+        let currentFilter = Object.keys(filterGroups).includes(INITIAL_FILTER) ? INITIAL_FILTER : (filterAliases[INITIAL_FILTER] || 'all');
 
         const typeMap = {
+            pengiriman:{ color: '#10b981', bg: 'rgba(16,185,129,.12)', icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 17H8m5-13H3a1 1 0 00-1 1v9a1 1 0 001 1h2m10-11l4 4m0 0v6h-4m0-6h-3v6h3' },
             arrived:   { color: '#10b981', bg: 'rgba(16,185,129,.12)', icon: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 17H8m5-13H3a1 1 0 00-1 1v9a1 1 0 001 1h2m10-11l4 4m0 0v6h-4m0-6h-3v6h3' },
             price:     { color: '#f59e0b', bg: 'rgba(245,158,11,.12)', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
+            stok:      { color: '#ef4444', bg: 'rgba(239,68,68,.12)', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
             low_stock: { color: '#ef4444', bg: 'rgba(239,68,68,.12)', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' },
             chat:      { color: '#3b82f6', bg: 'rgba(59,130,246,.12)', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
             info:      { color: '#8b5cf6', bg: 'rgba(139,92,246,.12)', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
@@ -102,14 +112,16 @@
 
         function renderNotif(list) {
             const container = document.getElementById('notifList');
-            const filtered = currentFilter === 'all' ? list : list.filter(n => n.tipe === currentFilter);
+            const acceptedTypes = filterGroups[currentFilter] || ['all'];
+            const filtered = currentFilter === 'all' ? list : list.filter(n => acceptedTypes.includes(n.tipe));
             document.getElementById('emptyState').classList.toggle('hidden', filtered.length > 0);
             container.innerHTML = filtered.map(n => {
                 const t = typeMap[n.tipe] || typeMap.info;
                 const time = n.created_at ? new Date(n.created_at).toLocaleString('id', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-';
                 return `
                 <div class="notif-card bg-white rounded-2xl border border-gray-100 p-5 flex gap-4 items-start transition-all hover:shadow-md cursor-pointer ${!Number(n.dibaca) ? 'border-l-4 border-l-emerald-500' : ''}"
-                     onclick="markRead(${n.id}, this)">
+                     data-link="${escAttr(n.link || '')}"
+                     onclick="openNotif(${n.id}, this)">
                     <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:${t.bg}">
                         <svg class="w-5 h-5" style="color:${t.color}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${t.icon}"/></svg>
                     </div>
@@ -163,6 +175,14 @@
             });
         }
 
+        async function openNotif(id, el) {
+            await markRead(id, el);
+            const link = el.dataset.link;
+            if (link) {
+                window.location.href = link;
+            }
+        }
+
         async function markAll() {
             await fetch(NOTIF_READ_ALL, {
                 method: 'PATCH',
@@ -183,12 +203,16 @@
 
         function setActiveFilterButton(type) {
             document.querySelectorAll('.nf-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('f-' + type).classList.add('active');
+            document.getElementById('f-' + type)?.classList.add('active');
         }
 
         function escHtml(s) {
             if (!s) return '';
             return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function escAttr(s) {
+            return escHtml(s).replace(/"/g, '&quot;');
         }
 
         loadNotif();

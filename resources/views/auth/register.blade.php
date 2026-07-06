@@ -59,7 +59,7 @@
                         </label>
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">No. HP</span>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" autocomplete="tel" placeholder="08xxxxxxxxxx" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" class="ag-input @error('phone') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                            <input type="text" name="phone" value="{{ old('phone') }}" autocomplete="tel" inputmode="numeric" pattern="[0-9]{10,15}" maxlength="15" data-digits-only placeholder="08xxxxxxxxxx" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" class="ag-input @error('phone') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
                             <x-ui.field-error name="phone" />
                         </label>
                     </div>
@@ -89,20 +89,20 @@
             </section>
 
             <section class="rounded-3xl border border-slate-200 bg-white p-4">
-                <h2 class="text-sm font-black uppercase text-slate-700">Alamat dan Lokasi</h2>
-                <p class="mt-1 text-xs font-semibold text-slate-500">Isi koordinat sesuai lokasi lahan atau distributor.</p>
-                <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                    <label class="block">
-                        <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Latitude</span>
-                        <input type="number" step="any" name="latitude" value="{{ old('latitude') }}" placeholder="-6.200000" data-location-required {{ in_array(old('role'), ['farmer', 'distributor'], true) ? 'required' : '' }} aria-invalid="{{ $errors->has('latitude') ? 'true' : 'false' }}" class="ag-input @error('latitude') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
-                        <x-ui.field-error name="latitude" />
-                    </label>
-                    <label class="block">
-                        <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Longitude</span>
-                        <input type="number" step="any" name="longitude" value="{{ old('longitude') }}" placeholder="106.816666" data-location-required {{ in_array(old('role'), ['farmer', 'distributor'], true) ? 'required' : '' }} aria-invalid="{{ $errors->has('longitude') ? 'true' : 'false' }}" class="ag-input @error('longitude') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
-                        <x-ui.field-error name="longitude" />
-                    </label>
-                </div>
+                <x-location-picker
+                    id="register-location-picker"
+                    title="Lokasi"
+                    description="Untuk Pembeli, lokasi boleh dikosongkan saat daftar. Untuk Petani/Distributor, pilih wilayah lahan atau gudang agar admin bisa memverifikasi area Anda."
+                    :province-value="old('province')"
+                    :district-value="old('district')"
+                    :sub-district-value="old('sub_district')"
+                    :village-value="old('village')"
+                    :address-value="old('address')"
+                    :latitude-value="old('latitude')"
+                    :longitude-value="old('longitude')"
+                    :include-coordinates="false"
+                    :dynamic-required="true"
+                />
             </section>
 
             <section id="farmer-fields" class="{{ old('role') == 'farmer' ? '' : 'hidden' }} rounded-3xl border border-emerald-200 bg-emerald-50 p-4">
@@ -111,7 +111,7 @@
                 <div class="mt-4 grid gap-4 sm:grid-cols-2">
                     <label class="block">
                         <span class="mb-2 block text-xs font-bold uppercase text-emerald-800">NIK</span>
-                        <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" pattern="[0-9]{16}" autocomplete="off" placeholder="16 digit" data-farmer-required {{ old('role') == 'farmer' ? 'required' : '' }} aria-invalid="{{ $errors->has('nik') ? 'true' : 'false' }}" class="ag-input @error('nik') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" pattern="[0-9]{16}" data-digits-only autocomplete="off" placeholder="16 digit" data-farmer-required {{ old('role') == 'farmer' ? 'required' : '' }} aria-invalid="{{ $errors->has('nik') ? 'true' : 'false' }}" class="ag-input @error('nik') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
                         <x-ui.field-error name="nik" />
                     </label>
                     <label class="block">

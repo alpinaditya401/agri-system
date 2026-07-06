@@ -23,11 +23,16 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        if ($request->has('phone')) {
+            $phone = trim((string) $request->input('phone'));
+            $request->merge(['phone' => $phone === '' ? null : $phone]);
+        }
+
         $validated = $request->validate([
             'name'          => ['required', 'string', 'max:255'],
             'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'remove_profile_photo' => ['nullable', 'boolean'],
-            'phone'         => ['nullable', 'string', 'max:20'],
+            'phone'         => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'address'       => ['nullable', 'string'],
             'province'      => ['nullable', 'string', 'max:100'],
             'district'      => ['nullable', 'string', 'max:100'],
@@ -35,6 +40,8 @@ class ProfileController extends Controller
             'village'       => ['nullable', 'string', 'max:100'],
             'latitude'      => ['nullable', 'numeric', 'between:-90,90'],
             'longitude'     => ['nullable', 'numeric', 'between:-180,180'],
+        ], [
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
         ]);
 
         unset($validated['profile_photo'], $validated['remove_profile_photo']);

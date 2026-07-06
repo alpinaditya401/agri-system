@@ -45,6 +45,8 @@
                     <p class="mt-3 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">Catatan: {{ $order->buyer_notes }}</p>
                 @endif
             </x-ui.card>
+
+            <x-order-timeline :order="$order" />
         </div>
 
         <aside class="space-y-5">

@@ -106,6 +106,7 @@ railway run php artisan db:seed --class=BpsSourceArticleSeeder --force
 Command yang dijadwalkan:
 
 - `bps:fetch-prices` setiap hari pukul `00:00`
+- `orders:cancel-expired` setiap jam untuk membatalkan order pending yang kedaluwarsa
 - `fertilizer:quota-reminder` setiap hari pukul `07:00`
 
 Cek schedule:

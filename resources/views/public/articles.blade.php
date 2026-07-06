@@ -50,7 +50,14 @@
                 <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                     @foreach ($articles as $article)
                         @php
-                            $coverImage = $article->cover_image ?: 'images/articles/distribusi-pertanian.webp';
+                            $fallbackCovers = [
+                                'harga' => 'images/commodities/cabai-merah.webp',
+                                'marketplace' => 'images/landing/petani.webp',
+                                'pupuk' => 'images/landing/sawah.webp',
+                                'edukasi' => 'images/commodities/gabah.webp',
+                                'distribusi' => 'images/articles/distribusi-pertanian.webp',
+                            ];
+                            $coverImage = $article->cover_image ?: ($fallbackCovers[$article->category] ?? 'images/articles/distribusi-pertanian.webp');
                             $webpCover = preg_replace('/\.(png|jpe?g)$/i', '.webp', $coverImage);
                             if ($webpCover && file_exists(public_path($webpCover))) {
                                 $coverImage = $webpCover;

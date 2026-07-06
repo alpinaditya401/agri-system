@@ -37,13 +37,20 @@ class UserManagementController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($request->has('phone')) {
+            $phone = trim((string) $request->input('phone'));
+            $request->merge(['phone' => $phone === '' ? null : $phone]);
+        }
+
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
             'role_id'  => ['required', 'exists:roles,id'],
-            'phone'    => ['nullable', 'string', 'max:20'],
+            'phone'    => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'is_active'=> ['boolean'],
+        ], [
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
         ]);
 
         if (!$this->roleCanBeAssigned($request->user(), (int) $validated['role_id'])) {
@@ -86,12 +93,19 @@ class UserManagementController extends Controller
      */
     public function update(Request $request, User $user): RedirectResponse
     {
+        if ($request->has('phone')) {
+            $phone = trim((string) $request->input('phone'));
+            $request->merge(['phone' => $phone === '' ? null : $phone]);
+        }
+
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', "unique:users,email,{$user->id}"],
             'role_id'  => ['required', 'exists:roles,id'],
-            'phone'    => ['nullable', 'string', 'max:20'],
+            'phone'    => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'is_active'=> ['boolean'],
+        ], [
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
         ]);
 
         if (!$this->canManageUser($request->user(), $user)) {

@@ -66,7 +66,7 @@ class PaymentWebhookTest extends TestCase
         $order->refresh();
 
         $this->assertSame('paid', $order->payment_status);
-        $this->assertSame('confirmed', $order->order_status);
+        $this->assertSame('pending', $order->order_status);
         $this->assertSame('trx-valid', $order->payment_reference);
 
         $this->assertDatabaseHas('notifications', [

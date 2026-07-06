@@ -28,6 +28,7 @@ Laravel scheduler tidak otomatis berjalan di Railway. Buat service atau cron job
 Command yang dijadwalkan di `routes/console.php`:
 
 - `bps:fetch-prices` harian pukul `00:00`
+- `orders:cancel-expired` setiap jam
 - `fertilizer:quota-reminder` harian pukul `07:00`
 
 Cek dari shell Railway:

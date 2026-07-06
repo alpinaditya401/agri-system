@@ -30,7 +30,7 @@ class OrderNotificationFlowTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'user_id' => $buyer->id,
-            'tipe' => 'arrived',
+            'tipe' => 'pengiriman',
             'judul' => 'Pesanan dikonfirmasi',
         ]);
 

@@ -7,6 +7,7 @@ use App\Models\FertilizerTransaction;
 use App\Models\FertilizerQuota;
 use App\Models\FertilizerType;
 use App\Models\FertilizerStock;
+use App\Models\Notification;
 use App\Services\FertilizerQuotaService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -185,6 +186,14 @@ class FertilizerController extends Controller
 
             DB::commit();
 
+            Notification::sendToUser(
+                userId: (int) $validated['distributor_id'],
+                tipe: 'info',
+                judul: 'Permintaan pupuk baru',
+                pesan: "Petani {$farmer->name} mengajukan {$requestedKg} kg {$fertilizerType->name}.",
+                link: route('distributor.fertilizer.show', $transaction),
+            );
+
             return redirect()->route('farmer.fertilizer.transactions.show', $transaction)
                 ->with('success', "Permintaan pupuk berhasil diajukan! "
                                . "No. Transaksi: {$transaction->transaction_number}. "
@@ -250,6 +259,14 @@ class FertilizerController extends Controller
             $transaction->update(['status' => 'cancelled']);
 
             DB::commit();
+
+            Notification::sendToUser(
+                userId: $transaction->distributor_id,
+                tipe: 'alert',
+                judul: 'Permintaan pupuk dibatalkan',
+                pesan: "Permintaan {$transaction->transaction_number} dibatalkan oleh petani.",
+                link: route('distributor.fertilizer.show', $transaction),
+            );
 
             return redirect()->route('farmer.fertilizer.history')->with('success', 'Permintaan pupuk berhasil dibatalkan.');
         } catch (\Throwable $e) {

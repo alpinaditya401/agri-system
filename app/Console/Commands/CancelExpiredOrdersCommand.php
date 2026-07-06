@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Order;
+use App\Services\OrderNotificationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -27,6 +28,8 @@ class CancelExpiredOrdersCommand extends Command
                 'payment_status' => 'failed',
                 'order_status'   => 'cancelled',
             ]);
+
+            app(OrderNotificationService::class)->orderCancelled($order->fresh(['buyer', 'farmer']));
             $count++;
         }
 

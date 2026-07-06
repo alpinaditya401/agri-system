@@ -52,7 +52,7 @@
                     </label>
                     <label class="block">
                         <span class="text-xs font-black uppercase tracking-wide text-slate-500">No. HP</span>
-                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="ag-input mt-1" placeholder="08xxxxxxxxxx">
+                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" inputmode="numeric" pattern="[0-9]{10,15}" maxlength="15" data-digits-only class="ag-input mt-1" placeholder="08xxxxxxxxxx">
                         @error('phone') <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p> @enderror
                     </label>
                 </div>
@@ -60,40 +60,21 @@
 
             <section>
                 <p class="ag-label">Alamat dan lokasi gudang</p>
-                <div class="mt-4 grid gap-4 md:grid-cols-2">
-                    <label class="block md:col-span-2">
-                        <span class="text-xs font-black uppercase tracking-wide text-slate-500">Alamat gudang</span>
-                        <textarea name="address" required rows="3" class="ag-input mt-1" placeholder="Alamat lengkap gudang">{{ old('address', $user->address) }}</textarea>
-                        @error('address') <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p> @enderror
-                    </label>
-                    <label class="block">
-                        <span class="text-xs font-black uppercase tracking-wide text-slate-500">Provinsi</span>
-                        <input type="text" name="province" value="{{ old('province', $user->province) }}" class="ag-input mt-1" placeholder="Jawa Barat">
-                        @error('province') <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p> @enderror
-                    </label>
-                    <label class="block">
-                        <span class="text-xs font-black uppercase tracking-wide text-slate-500">Kabupaten/Kota</span>
-                        <input type="text" name="district" value="{{ old('district', $user->district) }}" required class="ag-input mt-1" placeholder="Karawang">
-                        @error('district') <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p> @enderror
-                    </label>
-                    <label class="block">
-                        <span class="text-xs font-black uppercase tracking-wide text-slate-500">Kecamatan</span>
-                        <input type="text" name="sub_district" value="{{ old('sub_district', $user->sub_district) }}" class="ag-input mt-1" placeholder="Opsional">
-                    </label>
-                    <label class="block">
-                        <span class="text-xs font-black uppercase tracking-wide text-slate-500">Desa/Kelurahan</span>
-                        <input type="text" name="village" value="{{ old('village', $user->village) }}" class="ag-input mt-1" placeholder="Opsional">
-                    </label>
-                    <label class="block">
-                        <span class="text-xs font-black uppercase tracking-wide text-slate-500">Latitude</span>
-                        <input type="number" step="0.00000001" name="latitude" value="{{ old('latitude', $user->latitude) }}" required class="ag-input mt-1" placeholder="-6.200000">
-                        @error('latitude') <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p> @enderror
-                    </label>
-                    <label class="block">
-                        <span class="text-xs font-black uppercase tracking-wide text-slate-500">Longitude</span>
-                        <input type="number" step="0.00000001" name="longitude" value="{{ old('longitude', $user->longitude) }}" required class="ag-input mt-1" placeholder="106.816666">
-                        @error('longitude') <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p> @enderror
-                    </label>
+                <div class="mt-4">
+                    <x-location-picker
+                        id="become-distributor-location-picker"
+                        title="Wilayah Gudang"
+                        description="Pilih wilayah gudang sampai desa/kelurahan. Tulis gang, RT/RW, nomor gudang, dan patokan pada alamat detail."
+                        :province-value="old('province', $user->province)"
+                        :district-value="old('district', $user->district)"
+                        :sub-district-value="old('sub_district', $user->sub_district)"
+                        :village-value="old('village', $user->village)"
+                        :address-value="old('address', $user->address)"
+                        :latitude-value="old('latitude', $user->latitude)"
+                        :longitude-value="old('longitude', $user->longitude)"
+                        :required="true"
+                        :address-required="true"
+                    />
                 </div>
             </section>
 

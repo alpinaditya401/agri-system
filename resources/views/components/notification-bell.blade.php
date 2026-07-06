@@ -54,10 +54,10 @@
             }
 
             list.innerHTML = json.recent.map((notif) => `
-                <div class="px-4 py-3 transition hover:bg-slate-50 ${!notif.dibaca ? 'bg-emerald-50/60' : ''}">
+                <a href="${escBellAttr(notif.link || '{{ route('notifications.index') }}')}" class="block px-4 py-3 transition hover:bg-slate-50 ${!notif.dibaca ? 'bg-emerald-50/60' : ''}">
                     <p class="text-xs font-bold text-slate-900">${escBell(notif.judul)}</p>
                     <p class="mt-1 text-[11px] leading-5 text-slate-500">${escBell(notif.pesan)}</p>
-                </div>
+                </a>
             `).join('');
         } catch (e) {
             list.innerHTML = '<p class="py-6 text-center text-xs font-semibold text-slate-400">Gagal memuat notifikasi</p>';
@@ -69,6 +69,10 @@
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
+    }
+
+    function escBellAttr(value) {
+        return escBell(value).replace(/"/g, '&quot;');
     }
 })();
 </script>

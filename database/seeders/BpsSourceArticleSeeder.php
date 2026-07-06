@@ -28,7 +28,7 @@ class BpsSourceArticleSeeder extends Seeder
                     'Data gabah dan beras berasal dari tabel harga langsung BPS. Data sayur dan buah memakai estimasi harga implisit dari tabel BPS utuh: pengeluaran dibagi konsumsi.',
                     'Daftar link sumber BPS tersedia di bawah artikel ini supaya pembaca bisa membuka konteks data lengkap dari website BPS.',
                 ]),
-                'cover_image' => null,
+                'cover_image' => 'images/commodities/beras.webp',
                 'category' => 'harga',
                 'tags' => ['bps', 'harga', 'sumber-data'],
                 'status' => 'published',
@@ -43,6 +43,7 @@ class BpsSourceArticleSeeder extends Seeder
                 'excerpt' => 'Panduan singkat memahami sumber, kategori, wilayah, dan tanggal harga komoditas yang tampil di Agrilink.',
                 'category' => 'harga',
                 'tags' => ['bps', 'harga', 'komoditas'],
+                'cover_image' => 'images/commodities/cabai-merah.webp',
                 'content' => [
                     'Harga komoditas perlu dibaca bersama konteks sumber, wilayah, dan tanggal data. Angka terbaru belum tentu mewakili harga transaksi di semua pasar lokal, tetapi bisa menjadi patokan awal untuk negosiasi.',
                     'Di Agrilink, data harga dipakai sebagai referensi pembeli dan petani saat membandingkan harga produk. Perhatikan kategori, satuan, dan wilayah sebelum mengambil keputusan.',
@@ -55,6 +56,7 @@ class BpsSourceArticleSeeder extends Seeder
                 'excerpt' => 'Langkah praktis untuk petani menyiapkan produk, stok, harga, dan deskripsi yang mudah dipercaya pembeli.',
                 'category' => 'marketplace',
                 'tags' => ['produk', 'petani', 'marketplace'],
+                'cover_image' => 'images/landing/petani.webp',
                 'content' => [
                     'Produk tani yang baik perlu informasi jelas: nama komoditas, satuan, stok tersedia, minimal order, asal wilayah, dan foto yang sesuai kondisi barang.',
                     'Gunakan harga yang realistis dengan membandingkan referensi harga komoditas. Jelaskan keunggulan produk seperti panen baru, varietas, kualitas sortir, atau metode budidaya.',
@@ -67,6 +69,7 @@ class BpsSourceArticleSeeder extends Seeder
                 'excerpt' => 'Apa saja yang perlu dilengkapi petani sebelum mengajukan kuota dan transaksi pupuk bersubsidi.',
                 'category' => 'pupuk',
                 'tags' => ['pupuk', 'subsidi', 'kuota'],
+                'cover_image' => 'images/landing/sawah.webp',
                 'content' => [
                     'Sebelum mengajukan pupuk bersubsidi, pastikan profil petani sudah lengkap dan terverifikasi. NIK, kelompok tani, luas lahan, dan komoditas utama membantu admin mengalokasikan kuota.',
                     'Kuota pupuk dihitung per jenis pupuk, musim tanam, dan tahun berjalan. Jika kuota belum muncul, hubungi admin atau lengkapi data profil terlebih dahulu.',
@@ -79,6 +82,7 @@ class BpsSourceArticleSeeder extends Seeder
                 'excerpt' => 'Cara sederhana menjaga kadar air, kebersihan, dan penyimpanan agar gabah dan beras tetap bernilai baik.',
                 'category' => 'edukasi',
                 'tags' => ['gabah', 'beras', 'kualitas'],
+                'cover_image' => 'images/commodities/gabah.webp',
                 'content' => [
                     'Kualitas gabah dan beras sangat dipengaruhi proses panen, pengeringan, dan penyimpanan. Kadar air yang terlalu tinggi dapat menurunkan harga dan memperbesar risiko jamur.',
                     'Gunakan alas bersih saat pengeringan, hindari pencampuran dengan kotoran, dan simpan hasil panen di ruang kering dengan sirkulasi baik.',
@@ -91,6 +95,7 @@ class BpsSourceArticleSeeder extends Seeder
                 'excerpt' => 'Mengapa data lokasi, stok, dan status pengiriman penting untuk mempercepat distribusi hasil tani dan pupuk.',
                 'category' => 'distribusi',
                 'tags' => ['distribusi', 'peta', 'digital'],
+                'cover_image' => 'images/articles/distribusi-pertanian.webp',
                 'content' => [
                     'Distribusi pertanian digital membantu petani, pembeli, dan distributor melihat posisi pasokan secara lebih transparan. Data lokasi membuat pencarian produk dan stok pupuk lebih efisien.',
                     'Dengan status transaksi dan notifikasi, setiap pihak bisa mengetahui kapan pesanan diproses, dikirim, atau selesai.',
@@ -107,7 +112,7 @@ class BpsSourceArticleSeeder extends Seeder
                     'title' => $article['title'],
                     'excerpt' => $article['excerpt'],
                     'content' => implode("\n\n", $article['content']),
-                    'cover_image' => null,
+                    'cover_image' => $article['cover_image'],
                     'category' => $article['category'],
                     'tags' => $article['tags'],
                     'status' => 'published',

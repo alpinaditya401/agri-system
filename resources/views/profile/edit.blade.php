@@ -104,50 +104,24 @@
                     <h2 class="text-sm font-black uppercase text-slate-700">Kontak</h2>
                     <label class="mt-4 block">
                         <span class="mb-2 block text-xs font-bold uppercase text-slate-500">No. Telepon</span>
-                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="08xxxxxxxxxx" class="ag-input">
+                        <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" inputmode="numeric" pattern="[0-9]{10,15}" maxlength="15" data-digits-only placeholder="08xxxxxxxxxx" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" class="ag-input @error('phone') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                        <x-ui.field-error name="phone" />
                     </label>
                 </section>
 
                 <section class="rounded-3xl border border-slate-200 bg-white p-4">
-                    <h2 class="text-sm font-black uppercase text-slate-700">Alamat</h2>
-                    <label class="mt-4 block">
-                        <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Alamat Lengkap</span>
-                        <textarea name="address" rows="3" class="ag-input resize-none">{{ old('address', $user->address) }}</textarea>
-                    </label>
-
-                    <div class="mt-4 grid gap-4 md:grid-cols-2">
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Provinsi</span>
-                            <input type="text" name="province" value="{{ old('province', $user->province) }}" class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Kabupaten/Kota</span>
-                            <input type="text" name="district" value="{{ old('district', $user->district) }}" class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Kecamatan</span>
-                            <input type="text" name="sub_district" value="{{ old('sub_district', $user->sub_district) }}" class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Desa/Kelurahan</span>
-                            <input type="text" name="village" value="{{ old('village', $user->village) }}" class="ag-input">
-                        </label>
-                    </div>
-                </section>
-
-                <section class="rounded-3xl border border-slate-200 bg-white p-4">
-                    <h2 class="text-sm font-black uppercase text-slate-700">Lokasi</h2>
-                    <p class="mt-1 text-xs font-semibold text-slate-500">Koordinat membantu peta distribusi menampilkan lokasi dengan tepat.</p>
-                    <div class="mt-4 grid gap-4 md:grid-cols-2">
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Latitude</span>
-                            <input type="text" name="latitude" value="{{ old('latitude', $user->latitude) }}" class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Longitude</span>
-                            <input type="text" name="longitude" value="{{ old('longitude', $user->longitude) }}" class="ag-input">
-                        </label>
-                    </div>
+                    <x-location-picker
+                        id="profile-location-picker"
+                        title="Alamat dan Lokasi"
+                        description="Pilih wilayah administrasi, lalu lengkapi gang, RT/RW, nomor rumah, dan patokan di alamat detail."
+                        :province-value="old('province', $user->province)"
+                        :district-value="old('district', $user->district)"
+                        :sub-district-value="old('sub_district', $user->sub_district)"
+                        :village-value="old('village', $user->village)"
+                        :address-value="old('address', $user->address)"
+                        :latitude-value="old('latitude', $user->latitude)"
+                        :longitude-value="old('longitude', $user->longitude)"
+                    />
                 </section>
 
                 @if ($user->isFarmer() && $user->farmerProfile)

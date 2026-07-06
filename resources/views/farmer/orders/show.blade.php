@@ -105,6 +105,8 @@
                     Hubungi Pembeli
                 </a>
             </div>
+
+            <x-order-timeline :order="$order" />
         </div>
     </div>
 </x-layouts.app>

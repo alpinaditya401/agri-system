@@ -27,6 +27,11 @@ class DistributorRegistrationController extends Controller
 
         $existingProfile = $user->distributorProfile;
 
+        if ($request->has('phone')) {
+            $phone = trim((string) $request->input('phone'));
+            $request->merge(['phone' => $phone === '' ? null : $phone]);
+        }
+
         $validated = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
             'license_number' => [
@@ -36,35 +41,39 @@ class DistributorRegistrationController extends Controller
                 Rule::unique('distributor_profiles', 'license_number')->ignore($existingProfile?->id),
             ],
             'storage_capacity_kg' => ['required', 'integer', 'min:100', 'max:10000000'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'address' => ['required', 'string', 'max:500'],
-            'province' => ['nullable', 'string', 'max:100'],
+            'province' => ['required', 'string', 'max:100'],
             'district' => ['required', 'string', 'max:100'],
-            'sub_district' => ['nullable', 'string', 'max:100'],
-            'village' => ['nullable', 'string', 'max:100'],
-            'latitude' => ['required', 'numeric', 'between:-90,90'],
-            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'sub_district' => ['required', 'string', 'max:100'],
+            'village' => ['required', 'string', 'max:100'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ], [
             'company_name.required' => 'Nama usaha distributor wajib diisi.',
             'license_number.required' => 'Nomor izin distributor wajib diisi.',
             'license_number.unique' => 'Nomor izin ini sudah digunakan distributor lain.',
             'storage_capacity_kg.required' => 'Kapasitas gudang wajib diisi.',
             'storage_capacity_kg.min' => 'Kapasitas gudang minimal 100 kg.',
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
             'address.required' => 'Alamat gudang wajib diisi.',
+            'province.required' => 'Provinsi gudang wajib dipilih.',
             'district.required' => 'Kabupaten/Kota wajib diisi.',
-            'latitude.required' => 'Latitude gudang wajib diisi.',
-            'longitude.required' => 'Longitude gudang wajib diisi.',
+            'sub_district.required' => 'Kecamatan gudang wajib dipilih.',
+            'village.required' => 'Desa/Kelurahan gudang wajib dipilih.',
+            'latitude.numeric' => 'Titik lokasi gudang tidak valid.',
+            'longitude.numeric' => 'Titik lokasi gudang tidak valid.',
         ]);
 
         $user->update([
             'phone' => $validated['phone'] ?? $user->phone,
             'address' => $validated['address'],
-            'province' => $validated['province'] ?? $user->province,
+            'province' => $validated['province'],
             'district' => $validated['district'],
-            'sub_district' => $validated['sub_district'] ?? $user->sub_district,
-            'village' => $validated['village'] ?? $user->village,
-            'latitude' => $validated['latitude'],
-            'longitude' => $validated['longitude'],
+            'sub_district' => $validated['sub_district'],
+            'village' => $validated['village'],
+            'latitude' => $validated['latitude'] ?? $user->latitude,
+            'longitude' => $validated['longitude'] ?? $user->longitude,
         ]);
 
         DistributorProfile::updateOrCreate(

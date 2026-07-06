@@ -31,22 +31,15 @@ class RegisterRequest extends FormRequest
             'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'role'     => ['required', Rule::in(['farmer', 'buyer', 'distributor'])],
-            'phone'    => ['nullable', 'string', 'max:20'],
+            'phone'    => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'address'  => ['nullable', 'string', 'max:500'],
             'province'     => ['nullable', 'string', 'max:100'],
             'district'     => ['nullable', 'string', 'max:100'],
             'sub_district' => ['nullable', 'string', 'max:100'],
             'village'      => ['nullable', 'string', 'max:100'],
 
-            // ── Coordinates — required for farmer & distributor ───────────────
-            'latitude'  => [
-                Rule::requiredIf(in_array($role, ['farmer', 'distributor'])),
-                'nullable', 'numeric', 'between:-90,90',
-            ],
-            'longitude' => [
-                Rule::requiredIf(in_array($role, ['farmer', 'distributor'])),
-                'nullable', 'numeric', 'between:-180,180',
-            ],
+            'latitude'  => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
 
             // ── Farmer-only fields ────────────────────────────────────────────
             // At least one of nik OR farmer_group_id must be present for farmers.
@@ -105,11 +98,12 @@ class RegisterRequest extends FormRequest
             'nik.size'    => 'NIK harus terdiri dari tepat 16 digit angka.',
             'nik.regex'   => 'NIK hanya boleh berisi angka (0-9).',
             'nik.unique'  => 'NIK ini sudah terdaftar di sistem.',
-            'latitude.required_if'  => 'Koordinat latitude wajib diisi untuk petani dan distributor.',
-            'longitude.required_if' => 'Koordinat longitude wajib diisi untuk petani dan distributor.',
-            'latitude.between'  => 'Nilai latitude tidak valid (-90 hingga 90).',
-            'longitude.between' => 'Nilai longitude tidak valid (-180 hingga 180).',
+            'latitude.numeric' => 'Titik lokasi tidak valid.',
+            'longitude.numeric' => 'Titik lokasi tidak valid.',
+            'latitude.between'  => 'Titik lokasi tidak valid.',
+            'longitude.between' => 'Titik lokasi tidak valid.',
             'role.in' => 'Peran tidak valid. Pilih: Petani, Pembeli, atau Distributor.',
+            'phone.regex' => 'Nomor HP hanya boleh angka 10-15 digit.',
             'company_name.required_if' => 'Nama perusahaan wajib diisi untuk distributor.',
         ];
     }
@@ -124,6 +118,10 @@ class RegisterRequest extends FormRequest
         }
         if ($this->has('email')) {
             $this->merge(['email' => strtolower(trim($this->input('email')))]);
+        }
+        if ($this->has('phone')) {
+            $phone = trim((string) $this->input('phone'));
+            $this->merge(['phone' => $phone === '' ? null : $phone]);
         }
     }
 }

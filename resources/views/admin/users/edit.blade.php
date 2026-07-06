@@ -38,8 +38,9 @@
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-gray-500">No. Telepon</label>
-                    <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
+                    <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" inputmode="numeric" pattern="[0-9]{10,15}" maxlength="15" data-digits-only placeholder="08xxxxxxxxxx"
                            class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
+                    @error('phone') <p class="mt-1 text-xs font-bold text-red-600">{{ $message }}</p> @enderror
                 </div>
             </div>
             <label class="flex items-center gap-2 text-sm text-gray-600">

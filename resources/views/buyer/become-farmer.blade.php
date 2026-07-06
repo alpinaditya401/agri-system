@@ -26,7 +26,7 @@
                     <div class="mt-4 grid gap-4 md:grid-cols-2">
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">NIK</span>
-                            <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" placeholder="16 digit angka" class="ag-input">
+                            <input type="text" name="nik" value="{{ old('nik') }}" maxlength="16" inputmode="numeric" pattern="[0-9]{16}" data-digits-only placeholder="16 digit angka" class="ag-input">
                         </label>
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">ID Kelompok Tani</span>
@@ -57,45 +57,28 @@
                 <section class="rounded-3xl border border-slate-200 bg-white p-4">
                     <p class="ag-label">Kontak & Lokasi</p>
                     <h2 class="mt-2 text-lg font-black text-slate-950">Alamat Lahan</h2>
-                    <div class="mt-4 grid gap-4 md:grid-cols-2">
+                    <div class="mt-4">
                         <label class="block">
                             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">No. HP</span>
-                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Kabupaten/Kota</span>
-                            <input type="text" name="district" value="{{ old('district', $user->district) }}" required class="ag-input">
-                        </label>
-                        <label class="block md:col-span-2">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Alamat Lengkap</span>
-                            <textarea name="address" rows="3" class="ag-input resize-none">{{ old('address', $user->address) }}</textarea>
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Provinsi</span>
-                            <input type="text" name="province" value="{{ old('province', $user->province) }}" class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Kecamatan</span>
-                            <input type="text" name="sub_district" value="{{ old('sub_district', $user->sub_district) }}" class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Desa/Kelurahan</span>
-                            <input type="text" name="village" value="{{ old('village', $user->village) }}" class="ag-input">
-                        </label>
-                        <div></div>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Latitude</span>
-                            <input id="farmerLatitude" type="text" name="latitude" value="{{ old('latitude', $user->latitude) }}" required class="ag-input">
-                        </label>
-                        <label class="block">
-                            <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Longitude</span>
-                            <input id="farmerLongitude" type="text" name="longitude" value="{{ old('longitude', $user->longitude) }}" required class="ag-input">
+                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}" inputmode="numeric" pattern="[0-9]{10,15}" maxlength="15" data-digits-only placeholder="08xxxxxxxxxx" aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}" class="ag-input @error('phone') border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror">
+                            <x-ui.field-error name="phone" />
                         </label>
                     </div>
-                    <button type="button" id="useCurrentLocation" class="ag-btn-secondary mt-4">
-                        Gunakan Lokasi Saat Ini
-                    </button>
-                    <p id="locationHelper" class="mt-2 text-xs font-semibold text-slate-400">Browser akan meminta izin lokasi saat tombol ditekan.</p>
+                    <div class="mt-5">
+                        <x-location-picker
+                            id="become-farmer-location-picker"
+                            title="Wilayah Lahan"
+                            description="Pilih wilayah lahan sampai desa/kelurahan. Tulis gang, RT/RW, dan patokan lahan pada alamat detail."
+                            :province-value="old('province', $user->province)"
+                            :district-value="old('district', $user->district)"
+                            :sub-district-value="old('sub_district', $user->sub_district)"
+                            :village-value="old('village', $user->village)"
+                            :address-value="old('address', $user->address)"
+                            :latitude-value="old('latitude', $user->latitude)"
+                            :longitude-value="old('longitude', $user->longitude)"
+                            :required="true"
+                        />
+                    </div>
                 </section>
 
                 <div class="rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-800">
@@ -120,24 +103,4 @@
         </aside>
     </div>
 
-    @push('scripts')
-        <script>
-            document.getElementById('useCurrentLocation')?.addEventListener('click', () => {
-                const helper = document.getElementById('locationHelper');
-                if (!navigator.geolocation) {
-                    if (helper) helper.textContent = 'Browser tidak mendukung deteksi lokasi.';
-                    return;
-                }
-
-                if (helper) helper.textContent = 'Mengambil lokasi...';
-                navigator.geolocation.getCurrentPosition((position) => {
-                    document.getElementById('farmerLatitude').value = position.coords.latitude.toFixed(8);
-                    document.getElementById('farmerLongitude').value = position.coords.longitude.toFixed(8);
-                    if (helper) helper.textContent = 'Lokasi berhasil diisi.';
-                }, () => {
-                    if (helper) helper.textContent = 'Lokasi gagal diambil. Pastikan izin lokasi aktif.';
-                }, { enableHighAccuracy: true, timeout: 12000 });
-            });
-        </script>
-    @endpush
 </x-layouts.app>

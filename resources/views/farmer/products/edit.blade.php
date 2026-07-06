@@ -74,17 +74,20 @@
                     @endforeach
                 </select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="text-xs font-semibold text-gray-500">Provinsi Asal</label>
-                    <input type="text" name="origin_province" value="{{ old('origin_province', $produk->origin_province) }}"
-                           class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-gray-500">Kabupaten/Kota Asal</label>
-                    <input type="text" name="origin_district" value="{{ old('origin_district', $produk->origin_district) }}"
-                           class="w-full mt-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:border-emerald-400">
-                </div>
+            <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                <x-location-picker
+                    id="product-origin-location-picker"
+                    title="Asal Produk"
+                    description="Pilih asal produk dari data wilayah Indonesia. Sistem menyimpan provinsi dan kabupaten/kota untuk ditampilkan di marketplace."
+                    province-name="origin_province"
+                    district-name="origin_district"
+                    :province-value="old('origin_province', $produk->origin_province)"
+                    :district-value="old('origin_district', $produk->origin_district)"
+                    :include-sub-district="false"
+                    :include-village="false"
+                    :include-address="false"
+                    :include-coordinates="false"
+                />
             </div>
             <input type="hidden" name="origin_lat" value="{{ old('origin_lat', $produk->origin_lat) }}">
             <input type="hidden" name="origin_lng" value="{{ old('origin_lng', $produk->origin_lng) }}">

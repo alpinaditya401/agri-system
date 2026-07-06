@@ -56,7 +56,10 @@ class BuyerBecomeFarmerTest extends TestCase
                 'land_area_hectares' => '1.25',
                 'main_commodity' => 'Cabai Merah',
                 'phone' => '081234567890',
+                'province' => 'DI Yogyakarta',
                 'district' => 'Sleman',
+                'sub_district' => 'Depok',
+                'village' => 'Caturtunggal',
                 'latitude' => '-7.79560000',
                 'longitude' => '110.36950000',
             ])

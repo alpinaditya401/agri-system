@@ -12,6 +12,10 @@ Schedule::command('bps:fetch-prices')
     ->dailyAt('00:00')
     ->withoutOverlapping();
 
+Schedule::command('orders:cancel-expired')
+    ->hourly()
+    ->withoutOverlapping();
+
 Schedule::command('fertilizer:quota-reminder')
     ->dailyAt('07:00')
     ->withoutOverlapping();

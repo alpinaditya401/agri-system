@@ -35,6 +35,10 @@ class DistributorApplicationTest extends TestCase
             'password_confirmation' => 'password',
             'company_name' => 'CV Pupuk Baru',
             'license_number' => 'NIB-DIRECT-001',
+            'province' => 'Jawa Barat',
+            'district' => 'Karawang',
+            'sub_district' => 'Karawang Barat',
+            'village' => 'Tanjungpura',
             'latitude' => '-6.30500000',
             'longitude' => '107.30000000',
         ])
@@ -106,6 +110,8 @@ class DistributorApplicationTest extends TestCase
                 'address' => 'Gudang Pupuk No. 1',
                 'province' => 'Jawa Barat',
                 'district' => 'Karawang',
+                'sub_district' => 'Karawang Barat',
+                'village' => 'Tanjungpura',
                 'latitude' => '-6.30500000',
                 'longitude' => '107.30000000',
             ])

@@ -1,6 +1,12 @@
 import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-digits-only]').forEach((input) => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/\D/g, '');
+        });
+    });
+
     document.querySelectorAll('form').forEach((form) => {
         form.addEventListener('submit', (event) => {
             const methodField = form.querySelector('input[name="_method"]');

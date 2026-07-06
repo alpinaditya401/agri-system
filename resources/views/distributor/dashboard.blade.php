@@ -14,7 +14,7 @@
         <a href="{{ route('distributor.stock.index') }}" class="ag-btn-primary">Kelola Stok</a>
         <a href="{{ route('distributor.stock.history') }}" class="ag-btn-secondary">Riwayat Stok</a>
         <a href="{{ route('distributor.fertilizer.index') }}" class="ag-btn-secondary">Proses Permintaan</a>
-        <a href="{{ route('notifications.index', ['filter' => 'low_stock']) }}" class="ag-btn-secondary">Alert Stok</a>
+        <a href="{{ route('notifications.index', ['filter' => 'stok']) }}" class="ag-btn-secondary">Alert Stok</a>
     </div>
 
     <!-- STAT CARDS ROW -->

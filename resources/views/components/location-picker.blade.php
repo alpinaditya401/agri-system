@@ -76,14 +76,13 @@
         @if ($includeSubDistrict)
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Kecamatan</span>
-                <select class="ag-select @error($subDistrictName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
-                    data-location-select="sub_district"
-                    data-selected-name="{{ $subDistrictValue }}"
+                <input type="text" value="{{ $subDistrictValue }}" placeholder="Contoh: Telukjambe Timur"
+                    class="ag-input @error($subDistrictName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
+                    data-location-manual-main="subDistrict"
                     aria-invalid="{{ $errors->has($subDistrictName) ? 'true' : 'false' }}"
                     @if ($required) required @endif
                     @if ($dynamicRequired) data-location-required @endif>
-                    <option value="">Pilih kabupaten/kota dahulu</option>
-                </select>
+                <p class="mt-1 text-xs font-semibold text-slate-400">Diisi manual karena BPS domain hanya menyediakan provinsi dan kabupaten/kota.</p>
                 <x-ui.field-error :name="$subDistrictName" />
             </label>
         @endif
@@ -91,14 +90,12 @@
         @if ($includeVillage)
             <label class="block">
                 <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Desa/Kelurahan</span>
-                <select class="ag-select @error($villageName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
-                    data-location-select="village"
-                    data-selected-name="{{ $villageValue }}"
+                <input type="text" value="{{ $villageValue }}" placeholder="Contoh: Sukaharja"
+                    class="ag-input @error($villageName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
+                    data-location-manual-main="village"
                     aria-invalid="{{ $errors->has($villageName) ? 'true' : 'false' }}"
                     @if ($required) required @endif
                     @if ($dynamicRequired) data-location-required @endif>
-                    <option value="">Pilih kecamatan dahulu</option>
-                </select>
                 <x-ui.field-error :name="$villageName" />
             </label>
         @endif
@@ -113,7 +110,7 @@
                 <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Provinsi</span>
                 <input type="text" value="{{ $provinceValue }}" placeholder="Contoh: Jawa Barat"
                     class="ag-input bg-white @error($provinceName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
-                    data-location-manual="province"
+                    data-location-fallback="province"
                     disabled
                     @if ($required) required @endif
                     @if ($dynamicRequired) data-location-required @endif>
@@ -123,7 +120,7 @@
                 <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Kabupaten/Kota</span>
                 <input type="text" value="{{ $districtValue }}" placeholder="Contoh: Karawang"
                     class="ag-input bg-white @error($districtName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
-                    data-location-manual="district"
+                    data-location-fallback="district"
                     disabled
                     @if ($required) required @endif
                     @if ($dynamicRequired) data-location-required @endif>
@@ -134,7 +131,7 @@
                     <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Kecamatan</span>
                     <input type="text" value="{{ $subDistrictValue }}" placeholder="Contoh: Telukjambe Timur"
                         class="ag-input bg-white @error($subDistrictName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
-                        data-location-manual="sub_district"
+                        data-location-fallback="subDistrict"
                         disabled
                         @if ($required) required @endif
                         @if ($dynamicRequired) data-location-required @endif>
@@ -146,7 +143,7 @@
                     <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Desa/Kelurahan</span>
                     <input type="text" value="{{ $villageValue }}" placeholder="Contoh: Sukaharja"
                         class="ag-input bg-white @error($villageName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
-                        data-location-manual="village"
+                        data-location-fallback="village"
                         disabled
                         @if ($required) required @endif
                         @if ($dynamicRequired) data-location-required @endif>
@@ -197,15 +194,13 @@
         if (!root || root.dataset.locationBound === '1') return;
         root.dataset.locationBound = '1';
 
-        const API_BASE = 'https://wilayah.id/api';
+        const API_BASE = @json(url('/api/bps/domains'));
         const status = root.querySelector('[data-location-status]');
         const selectGrid = root.querySelector('[data-location-select-grid]');
         const manualPanel = root.querySelector('[data-location-manual-panel]');
         const selects = {
             province: root.querySelector('[data-location-select="province"]'),
             district: root.querySelector('[data-location-select="district"]'),
-            subDistrict: root.querySelector('[data-location-select="sub_district"]'),
-            village: root.querySelector('[data-location-select="village"]'),
         };
         const hidden = {
             province: root.querySelector('[data-location-hidden="province"]'),
@@ -213,18 +208,20 @@
             subDistrict: root.querySelector('[data-location-hidden="sub_district"]'),
             village: root.querySelector('[data-location-hidden="village"]'),
         };
-        const manualInputs = {
-            province: root.querySelector('[data-location-manual="province"]'),
-            district: root.querySelector('[data-location-manual="district"]'),
-            subDistrict: root.querySelector('[data-location-manual="sub_district"]'),
-            village: root.querySelector('[data-location-manual="village"]'),
+        const manualMainInputs = {
+            subDistrict: root.querySelector('[data-location-manual-main="subDistrict"]'),
+            village: root.querySelector('[data-location-manual-main="village"]'),
+        };
+        const fallbackInputs = {
+            province: root.querySelector('[data-location-fallback="province"]'),
+            district: root.querySelector('[data-location-fallback="district"]'),
+            subDistrict: root.querySelector('[data-location-fallback="subDistrict"]'),
+            village: root.querySelector('[data-location-fallback="village"]'),
         };
 
         const endpoints = {
-            provinces: `${API_BASE}/provinces.json`,
-            regencies: (provinceCode) => `${API_BASE}/regencies/${provinceCode}.json`,
-            districts: (regencyCode) => `${API_BASE}/districts/${regencyCode}.json`,
-            villages: (districtCode) => `${API_BASE}/villages/${districtCode}.json`,
+            provinces: `${API_BASE}/provinces`,
+            regencies: (provinceCode) => `${API_BASE}/regencies?province=${encodeURIComponent(provinceCode)}`,
         };
 
         const normalize = (value) => (value || '')
@@ -257,15 +254,13 @@
 
         const optionName = (select) => select?.selectedOptions?.[0]?.dataset?.name || '';
 
-        const hiddenKey = (key) => key === 'subDistrict' ? 'subDistrict' : key;
-
-        const setHiddenFromManual = (key) => {
-            const actualKey = hiddenKey(key);
-            if (!hidden[actualKey] || !manualInputs[actualKey]) return;
-            hidden[actualKey].value = manualInputs[actualKey].value.trim();
+        const setHiddenFromManual = (key, source = 'main') => {
+            const input = source === 'fallback' ? fallbackInputs[key] : manualMainInputs[key];
+            if (!hidden[key] || !input) return;
+            hidden[key].value = input.value.trim();
         };
 
-        const enableManualFallback = (message = 'Data wilayah online belum bisa dimuat. Silakan isi lokasi manual.') => {
+        const enableManualFallback = (message = 'Data wilayah BPS belum bisa dimuat. Silakan isi lokasi manual.') => {
             selectGrid?.classList.add('hidden');
             manualPanel?.classList.remove('hidden');
 
@@ -273,7 +268,7 @@
                 if (select) select.disabled = true;
             });
 
-            Object.entries(manualInputs).forEach(([key, input]) => {
+            Object.entries(fallbackInputs).forEach(([key, input]) => {
                 if (!input) return;
 
                 input.disabled = false;
@@ -281,7 +276,7 @@
                 if (existing && !input.value) {
                     input.value = existing;
                 }
-                setHiddenFromManual(key);
+                setHiddenFromManual(key, 'fallback');
             });
 
             showStatus(message);
@@ -302,21 +297,17 @@
         const resetBelow = (level) => {
             if (level === 'province') {
                 resetSelect(selects.district, 'Pilih provinsi dahulu');
-                resetSelect(selects.subDistrict, 'Pilih kabupaten/kota dahulu');
-                resetSelect(selects.village, 'Pilih kecamatan dahulu');
                 if (hidden.district) hidden.district.value = '';
                 if (hidden.subDistrict) hidden.subDistrict.value = '';
                 if (hidden.village) hidden.village.value = '';
+                if (manualMainInputs.subDistrict) manualMainInputs.subDistrict.value = '';
+                if (manualMainInputs.village) manualMainInputs.village.value = '';
             }
             if (level === 'district') {
-                resetSelect(selects.subDistrict, 'Pilih kabupaten/kota dahulu');
-                resetSelect(selects.village, 'Pilih kecamatan dahulu');
                 if (hidden.subDistrict) hidden.subDistrict.value = '';
                 if (hidden.village) hidden.village.value = '';
-            }
-            if (level === 'subDistrict') {
-                resetSelect(selects.village, 'Pilih kecamatan dahulu');
-                if (hidden.village) hidden.village.value = '';
+                if (manualMainInputs.subDistrict) manualMainInputs.subDistrict.value = '';
+                if (manualMainInputs.village) manualMainInputs.village.value = '';
             }
         };
 
@@ -363,7 +354,7 @@
             } catch (error) {
                 select.innerHTML = `<option value="">API wilayah belum bisa diakses</option>`;
                 select.disabled = true;
-                enableManualFallback('Data wilayah belum bisa dimuat otomatis. Silakan isi lokasi manual di bawah ini.');
+                enableManualFallback('Data wilayah BPS belum bisa dimuat otomatis. Silakan isi lokasi manual di bawah ini.');
                 return false;
             }
         }
@@ -378,13 +369,8 @@
             }
 
             if (selects.district?.value && selects.district.value !== '__current') {
-                await loadOptions(selects.subDistrict, endpoints.districts(selects.district.value), 'Pilih kecamatan', hidden.subDistrict?.value);
-                setHiddenValue('subDistrict');
-            }
-
-            if (selects.subDistrict?.value && selects.subDistrict.value !== '__current') {
-                await loadOptions(selects.village, endpoints.villages(selects.subDistrict.value), 'Pilih desa/kelurahan', hidden.village?.value);
-                setHiddenValue('village');
+                setHiddenFromManual('subDistrict');
+                setHiddenFromManual('village');
             }
         }
 
@@ -399,23 +385,13 @@
         selects.district?.addEventListener('change', async () => {
             setHiddenValue('district');
             resetBelow('district');
-            if (selects.district.value && selects.district.value !== '__current') {
-                await loadOptions(selects.subDistrict, endpoints.districts(selects.district.value), 'Pilih kecamatan');
-            }
         });
 
-        selects.subDistrict?.addEventListener('change', async () => {
-            setHiddenValue('subDistrict');
-            resetBelow('subDistrict');
-            if (selects.subDistrict.value && selects.subDistrict.value !== '__current') {
-                await loadOptions(selects.village, endpoints.villages(selects.subDistrict.value), 'Pilih desa/kelurahan');
-            }
-        });
+        manualMainInputs.subDistrict?.addEventListener('input', () => setHiddenFromManual('subDistrict'));
+        manualMainInputs.village?.addEventListener('input', () => setHiddenFromManual('village'));
 
-        selects.village?.addEventListener('change', () => setHiddenValue('village'));
-
-        Object.entries(manualInputs).forEach(([key, input]) => {
-            input?.addEventListener('input', () => setHiddenFromManual(key));
+        Object.entries(fallbackInputs).forEach(([key, input]) => {
+            input?.addEventListener('input', () => setHiddenFromManual(key, 'fallback'));
         });
 
         root.querySelector('[data-location-current]')?.addEventListener('click', () => {

@@ -46,7 +46,7 @@
         <input type="hidden" name="{{ $villageName }}" value="{{ $villageValue }}" data-location-hidden="village">
     @endif
 
-    <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid gap-4 md:grid-cols-2" data-location-select-grid>
         <label class="block">
             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Provinsi</span>
             <select class="ag-select @error($provinceName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
@@ -104,6 +104,57 @@
         @endif
     </div>
 
+    <div class="hidden rounded-3xl border border-amber-200 bg-amber-50 p-4" data-location-manual-panel>
+        <p class="text-xs font-black uppercase text-amber-700">Isi Lokasi Manual</p>
+        <p class="mt-1 text-xs font-semibold leading-5 text-amber-700">Dropdown wilayah sedang tidak tersedia. Isi nama wilayah secara manual agar form tetap bisa dikirim.</p>
+
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+            <label class="block">
+                <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Provinsi</span>
+                <input type="text" value="{{ $provinceValue }}" placeholder="Contoh: Jawa Barat"
+                    class="ag-input bg-white @error($provinceName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
+                    data-location-manual="province"
+                    disabled
+                    @if ($required) required @endif
+                    @if ($dynamicRequired) data-location-required @endif>
+            </label>
+
+            <label class="block">
+                <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Kabupaten/Kota</span>
+                <input type="text" value="{{ $districtValue }}" placeholder="Contoh: Karawang"
+                    class="ag-input bg-white @error($districtName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
+                    data-location-manual="district"
+                    disabled
+                    @if ($required) required @endif
+                    @if ($dynamicRequired) data-location-required @endif>
+            </label>
+
+            @if ($includeSubDistrict)
+                <label class="block">
+                    <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Kecamatan</span>
+                    <input type="text" value="{{ $subDistrictValue }}" placeholder="Contoh: Telukjambe Timur"
+                        class="ag-input bg-white @error($subDistrictName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
+                        data-location-manual="sub_district"
+                        disabled
+                        @if ($required) required @endif
+                        @if ($dynamicRequired) data-location-required @endif>
+                </label>
+            @endif
+
+            @if ($includeVillage)
+                <label class="block">
+                    <span class="mb-2 block text-xs font-bold uppercase text-amber-800">Desa/Kelurahan</span>
+                    <input type="text" value="{{ $villageValue }}" placeholder="Contoh: Sukaharja"
+                        class="ag-input bg-white @error($villageName) border-red-300 focus:border-red-500 focus:ring-red-500/10 @enderror"
+                        data-location-manual="village"
+                        disabled
+                        @if ($required) required @endif
+                        @if ($dynamicRequired) data-location-required @endif>
+                </label>
+            @endif
+        </div>
+    </div>
+
     @if ($includeAddress)
         <label class="block">
             <span class="mb-2 block text-xs font-bold uppercase text-slate-500">Alamat Detail</span>
@@ -148,6 +199,8 @@
 
         const API_BASE = 'https://wilayah.id/api';
         const status = root.querySelector('[data-location-status]');
+        const selectGrid = root.querySelector('[data-location-select-grid]');
+        const manualPanel = root.querySelector('[data-location-manual-panel]');
         const selects = {
             province: root.querySelector('[data-location-select="province"]'),
             district: root.querySelector('[data-location-select="district"]'),
@@ -159,6 +212,12 @@
             district: root.querySelector('[data-location-hidden="district"]'),
             subDistrict: root.querySelector('[data-location-hidden="sub_district"]'),
             village: root.querySelector('[data-location-hidden="village"]'),
+        };
+        const manualInputs = {
+            province: root.querySelector('[data-location-manual="province"]'),
+            district: root.querySelector('[data-location-manual="district"]'),
+            subDistrict: root.querySelector('[data-location-manual="sub_district"]'),
+            village: root.querySelector('[data-location-manual="village"]'),
         };
 
         const endpoints = {
@@ -197,6 +256,36 @@
         const hideStatus = () => status?.classList.add('hidden');
 
         const optionName = (select) => select?.selectedOptions?.[0]?.dataset?.name || '';
+
+        const hiddenKey = (key) => key === 'subDistrict' ? 'subDistrict' : key;
+
+        const setHiddenFromManual = (key) => {
+            const actualKey = hiddenKey(key);
+            if (!hidden[actualKey] || !manualInputs[actualKey]) return;
+            hidden[actualKey].value = manualInputs[actualKey].value.trim();
+        };
+
+        const enableManualFallback = (message = 'Data wilayah online belum bisa dimuat. Silakan isi lokasi manual.') => {
+            selectGrid?.classList.add('hidden');
+            manualPanel?.classList.remove('hidden');
+
+            Object.values(selects).forEach((select) => {
+                if (select) select.disabled = true;
+            });
+
+            Object.entries(manualInputs).forEach(([key, input]) => {
+                if (!input) return;
+
+                input.disabled = false;
+                const existing = hidden[key]?.value || '';
+                if (existing && !input.value) {
+                    input.value = existing;
+                }
+                setHiddenFromManual(key);
+            });
+
+            showStatus(message);
+        };
 
         const setHiddenValue = (key) => {
             if (!hidden[key]) return;
@@ -274,7 +363,7 @@
             } catch (error) {
                 select.innerHTML = `<option value="">API wilayah belum bisa diakses</option>`;
                 select.disabled = true;
-                showStatus('Data wilayah belum bisa dimuat. Cek koneksi internet, lalu muat ulang halaman.');
+                enableManualFallback('Data wilayah belum bisa dimuat otomatis. Silakan isi lokasi manual di bawah ini.');
                 return false;
             }
         }
@@ -324,6 +413,10 @@
         });
 
         selects.village?.addEventListener('change', () => setHiddenValue('village'));
+
+        Object.entries(manualInputs).forEach(([key, input]) => {
+            input?.addEventListener('input', () => setHiddenFromManual(key));
+        });
 
         root.querySelector('[data-location-current]')?.addEventListener('click', () => {
             if (!navigator.geolocation) {

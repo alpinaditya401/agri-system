@@ -6,9 +6,6 @@
     $src = $endpoint ?? route('api.map.combined');
 @endphp
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <style>
     .leaflet-container {
         font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
@@ -88,7 +85,9 @@
 
 <div class="{{ $liveTrack ? 'grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px]' : '' }}">
     <div class="min-w-0">
-        <div id="{{ $mapId }}" style="height: {{ $height }};" class="w-full rounded-[1.5rem] border border-slate-200 z-0"></div>
+        <div id="{{ $mapId }}" style="height: {{ $height }};" class="flex w-full items-center justify-center rounded-[1.5rem] border border-slate-200 bg-emerald-50 text-xs font-black text-emerald-700 z-0">
+            <span>Memuat peta saat terlihat...</span>
+        </div>
 
         <div class="mt-4 flex flex-wrap items-center gap-3 text-xs font-bold text-slate-500">
             <span class="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-emerald-700"><span class="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Petani</span>
@@ -115,7 +114,69 @@
 <script>
 (function () {
     const mapElement = document.getElementById(@json($mapId));
-    if (!mapElement || typeof L === 'undefined') return;
+    if (!mapElement) return;
+
+    const bootMap = () => {
+        loadLeaflet()
+            .then(initMap)
+            .catch(() => {
+                mapElement.innerHTML = '<span>Peta belum bisa dimuat.</span>';
+            });
+    };
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries, obs) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            obs.disconnect();
+            bootMap();
+        }, { rootMargin: '280px 0px', threshold: 0.01 });
+
+        observer.observe(mapElement);
+    } else {
+        window.setTimeout(bootMap, 600);
+    }
+
+    function loadLeaflet() {
+        if (window.L) return Promise.resolve();
+        if (window.__agrilinkLeafletLoading) return window.__agrilinkLeafletLoading;
+
+        window.__agrilinkLeafletLoading = new Promise((resolve, reject) => {
+            if (!document.getElementById('agrilink-leaflet-css')) {
+                const link = document.createElement('link');
+                link.id = 'agrilink-leaflet-css';
+                link.rel = 'stylesheet';
+                link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+                document.head.appendChild(link);
+            }
+
+            if (window.L) {
+                resolve();
+                return;
+            }
+
+            const existing = document.getElementById('agrilink-leaflet-js');
+            if (existing) {
+                existing.addEventListener('load', () => resolve(), { once: true });
+                existing.addEventListener('error', reject, { once: true });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.id = 'agrilink-leaflet-js';
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.onload = () => resolve();
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+
+        return window.__agrilinkLeafletLoading;
+    }
+
+    function initMap() {
+        if (mapElement.dataset.mapLoaded === '1' || typeof L === 'undefined') return;
+        mapElement.dataset.mapLoaded = '1';
+        mapElement.innerHTML = '';
+        mapElement.classList.remove('flex', 'items-center', 'justify-center', 'bg-emerald-50', 'text-xs', 'font-black', 'text-emerald-700');
 
     const indonesiaBounds = L.latLngBounds(
         L.latLng(-11.2, 94.5),
@@ -350,6 +411,7 @@
 
     function escAttr(s) {
         return escMap(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
     }
 })();
 </script>

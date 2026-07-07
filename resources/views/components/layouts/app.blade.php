@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Agrilink' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar-link {
             display: flex;
@@ -218,8 +217,8 @@
             } catch (e) {}
         }
 
-        pollNotifSummary();
-        setInterval(pollNotifSummary, 20000);
+        window.setTimeout(pollNotifSummary, 1500);
+        setInterval(pollNotifSummary, 60000);
     </script>
     @stack('scripts')
 </body>

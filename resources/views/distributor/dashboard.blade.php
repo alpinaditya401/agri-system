@@ -8,6 +8,10 @@
         <p class="mt-1 text-sm text-slate-500">Kelola stok pupuk bersubsidi dan pantau permintaan dari petani di wilayah Anda.</p>
     </x-slot:header>
 
+    @push('head')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @endpush
+
     <x-dashboard-region-filter :filters="$regionFilters ?? []" :options="$regionOptions ?? []" description="Filter permintaan subsidi berdasarkan wilayah petani pemohon." />
 
     <div class="mb-5 flex flex-wrap gap-3">

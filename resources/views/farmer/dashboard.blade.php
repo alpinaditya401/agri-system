@@ -8,6 +8,10 @@
         <p class="mt-1 text-sm text-slate-500">Kelola produk, proses pesanan pembeli, pantau harga komoditas, dan ajukan pupuk bersubsidi.</p>
     </x-slot:header>
 
+    @push('head')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @endpush
+
     <x-dashboard-region-filter :filters="$regionFilters ?? []" :options="$regionOptions ?? []" description="Filter pesanan berdasarkan wilayah pembeli dan sesuaikan insight harga wilayah jika tersedia." />
 
     @php

@@ -34,6 +34,10 @@
         </div>
     </x-slot:header>
 
+    @push('head')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @endpush
+
     <x-dashboard-region-filter :filters="$regionFilters ?? []" :options="$regionOptions ?? []" description="Filter rekomendasi produk, pesanan, dan harga komoditas berdasarkan wilayah petani/penjual." />
 
     @php

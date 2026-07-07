@@ -28,8 +28,11 @@ class BpsApiService
 
     public function getLatestPrices(int $limit = 20): array
     {
-        try {
-            return CommodityPrice::query()
+        $limit = max(1, min($limit, 100));
+
+        return Cache::remember("bps_latest_prices_{$limit}", now()->addMinutes(10), function () use ($limit) {
+            try {
+                return CommodityPrice::query()
                 ->whereIn('id', function ($query) {
                     $query->selectRaw('MAX(id)')
                         ->from('commodity_prices')
@@ -41,9 +44,10 @@ class BpsApiService
                 ->get()
                 ->map(fn($price) => (object) $price->toArray())
                 ->toArray();
-        } catch (\Throwable) {
-            return [];
-        }
+            } catch (\Throwable) {
+                return [];
+            }
+        });
     }
 
     public function getByCategory(string $category, int $limit = 10): array
@@ -111,6 +115,9 @@ class BpsApiService
         }
 
         Cache::forget('bps_landing_prices');
+        foreach ([8, 10, 12, 20, 50, 100] as $limit) {
+            Cache::forget("bps_latest_prices_{$limit}");
+        }
 
         return [
             'fetched' => $fetched,

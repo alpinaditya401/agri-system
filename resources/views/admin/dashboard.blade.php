@@ -12,6 +12,10 @@
         </p>
     </x-slot:header>
 
+    @push('head')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @endpush
+
     <x-dashboard-region-filter :filters="$regionFilters ?? []" :options="$regionOptions ?? []" description="Filter statistik pengguna, order, permintaan pupuk, stok distributor, dan antrean verifikasi berdasarkan wilayah." />
 
     <!-- STAT CARDS ROW -->

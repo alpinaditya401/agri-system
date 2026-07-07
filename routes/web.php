@@ -162,7 +162,7 @@ Route::middleware(['auth', 'role:farmer'])
     Route::middleware('farmer.verified')->group(function () {
         // Product management
         Route::resource('produk', FarmerProductController::class);
-        Route::patch('produk/{product}/toggle-status', [FarmerProductController::class, 'toggleStatus'])
+        Route::patch('produk/{produk}/toggle-status', [FarmerProductController::class, 'toggleStatus'])
              ->name('produk.toggle-status');
 
         // Orders (incoming from buyers)

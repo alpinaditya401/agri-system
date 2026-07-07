@@ -197,7 +197,7 @@
         if (!root || root.dataset.locationBound === '1') return;
         root.dataset.locationBound = '1';
 
-        const API_BASE = 'https://wilayah.id/api';
+        const API_BASE = '/api/wilayah';
         const status = root.querySelector('[data-location-status]');
         const selectGrid = root.querySelector('[data-location-select-grid]');
         const manualPanel = root.querySelector('[data-location-manual-panel]');
@@ -221,10 +221,10 @@
         };
 
         const endpoints = {
-            provinces: `${API_BASE}/provinces.json`,
-            regencies: (provinceCode) => `${API_BASE}/regencies/${provinceCode}.json`,
-            districts: (regencyCode) => `${API_BASE}/districts/${regencyCode}.json`,
-            villages: (districtCode) => `${API_BASE}/villages/${districtCode}.json`,
+            provinces: `${API_BASE}/provinces`,
+            regencies: (provinceCode) => `${API_BASE}/regencies/${encodeURIComponent(provinceCode)}`,
+            districts: (regencyCode) => `${API_BASE}/districts/${encodeURIComponent(regencyCode)}`,
+            villages: (districtCode) => `${API_BASE}/villages/${encodeURIComponent(districtCode)}`,
         };
 
         const normalize = (value) => (value || '')

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -149,10 +150,20 @@ class User extends Authenticatable
             return $this->profile_photo_path;
         }
 
-        if (Str::startsWith($this->profile_photo_path, ['/storage/', 'storage/', '/images/', 'images/'])) {
-            return asset(ltrim($this->profile_photo_path, '/'));
+        if (Str::startsWith($this->profile_photo_path, ['/storage/', 'storage/'])) {
+            $path = Str::after(ltrim($this->profile_photo_path, '/'), 'storage/');
+
+            return Storage::disk('public')->exists($path) ? asset('storage/' . $path) : null;
         }
 
-        return asset('storage/' . ltrim($this->profile_photo_path, '/'));
+        if (Str::startsWith($this->profile_photo_path, ['/images/', 'images/'])) {
+            $path = ltrim($this->profile_photo_path, '/');
+
+            return file_exists(public_path($path)) ? asset($path) : null;
+        }
+
+        $path = ltrim($this->profile_photo_path, '/');
+
+        return Storage::disk('public')->exists($path) ? asset('storage/' . $path) : null;
     }
 }

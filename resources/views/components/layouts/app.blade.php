@@ -117,7 +117,8 @@
         <div class="border-t border-white/10 p-4">
             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/10 p-3 transition hover:bg-white/15">
                 @if ($currentUserPhoto)
-                    <img src="{{ $currentUserPhoto }}" alt="Foto profil {{ $currentUser?->name }}" class="h-11 w-11 flex-shrink-0 rounded-2xl object-cover ring-1 ring-white/20">
+                    <img src="{{ $currentUserPhoto }}" alt="Foto profil {{ $currentUser?->name }}" class="h-11 w-11 flex-shrink-0 rounded-2xl object-cover ring-1 ring-white/20" onerror="this.classList.add('hidden'); if (this.nextElementSibling) this.nextElementSibling.style.display = 'flex'">
+                    <span class="hidden h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-400 text-sm font-black text-emerald-950">{{ $currentUserInitial }}</span>
                 @else
                     <span class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-400 text-sm font-black text-emerald-950">{{ $currentUserInitial }}</span>
                 @endif
@@ -139,7 +140,8 @@
                     @include('components.notification-bell')
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:bg-slate-50">
                         @if ($currentUserPhoto)
-                            <img src="{{ $currentUserPhoto }}" alt="Foto profil {{ $currentUser?->name }}" class="h-9 w-9 rounded-xl object-cover">
+                            <img src="{{ $currentUserPhoto }}" alt="Foto profil {{ $currentUser?->name }}" class="h-9 w-9 rounded-xl object-cover" onerror="this.classList.add('hidden'); if (this.nextElementSibling) this.nextElementSibling.style.display = 'flex'">
+                            <span class="hidden h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-sm font-black text-emerald-700">{{ $currentUserInitial }}</span>
                         @else
                             <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-sm font-black text-emerald-700">{{ $currentUserInitial }}</span>
                         @endif

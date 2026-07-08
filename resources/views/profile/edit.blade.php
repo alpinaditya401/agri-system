@@ -24,7 +24,10 @@
             <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
                 <div class="relative">
                     @if ($profilePhoto)
-                        <img id="profilePhotoPreview" src="{{ $profilePhoto }}" alt="Foto profil {{ $user->name }}" class="h-24 w-24 rounded-[2rem] object-cover shadow-xl shadow-emerald-700/20 ring-4 ring-white">
+                        <img id="profilePhotoPreview" src="{{ $profilePhoto }}" alt="Foto profil {{ $user->name }}" class="h-24 w-24 rounded-[2rem] object-cover shadow-xl shadow-emerald-700/20 ring-4 ring-white" onerror="this.classList.add('hidden'); if (this.nextElementSibling) this.nextElementSibling.style.display = 'flex'">
+                        <div id="profilePhotoFallback" class="hidden h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-emerald-500 to-lime-400 text-4xl font-black text-white shadow-xl shadow-emerald-700/20">
+                            {{ $profileInitial }}
+                        </div>
                     @else
                         <div id="profilePhotoFallback" class="flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-emerald-500 to-lime-400 text-4xl font-black text-white shadow-xl shadow-emerald-700/20">
                             {{ $profileInitial }}

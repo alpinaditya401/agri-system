@@ -25,7 +25,8 @@
     @auth
         <a href="{{ route('profile.edit') }}" class="{{ $nameClass }}" title="{{ auth()->user()->name }}">
             @if ($currentUserPhoto)
-                <img src="{{ $currentUserPhoto }}" alt="Foto profil {{ $currentUser?->name }}" class="h-6 w-6 flex-shrink-0 rounded-full object-cover">
+                <img src="{{ $currentUserPhoto }}" alt="Foto profil {{ $currentUser?->name }}" class="h-6 w-6 flex-shrink-0 rounded-full object-cover" onerror="this.classList.add('hidden'); this.nextElementSibling?.classList.remove('hidden')">
+                <span class="hidden h-2 w-2 flex-shrink-0 rounded-full bg-emerald-300"></span>
             @else
                 <span class="h-2 w-2 flex-shrink-0 rounded-full bg-emerald-300"></span>
             @endif

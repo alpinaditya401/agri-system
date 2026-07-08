@@ -68,8 +68,16 @@
 
 <div {{ $attributes->merge(['class' => 'relative flex items-center justify-center overflow-hidden bg-gradient-to-br ' . $theme]) }}>
     @if ($image)
-        <img src="{{ $image }}" alt="{{ data_get($product, 'name', 'Produk pertanian') }}" loading="lazy" class="{{ $imageClass }}">
-    @else
+        <img
+            src="{{ $image }}"
+            alt="{{ data_get($product, 'name', 'Produk pertanian') }}"
+            loading="lazy"
+            class="{{ $imageClass }}"
+            onerror="this.classList.add('hidden'); const fallback = this.parentElement.querySelector('[data-product-fallback]'); if (fallback) { fallback.classList.remove('hidden'); fallback.classList.add('flex'); }"
+        >
+    @endif
+
+    <div data-product-fallback class="{{ $image ? 'hidden' : 'flex' }} absolute inset-0 items-center justify-center">
         <div class="absolute inset-0 opacity-45 [background-image:linear-gradient(135deg,rgba(255,255,255,.65)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.65)_50%,rgba(255,255,255,.65)_75%,transparent_75%,transparent)] [background-size:18px_18px]"></div>
         <div class="relative flex {{ $frameClass }} items-center justify-center bg-white/70 shadow-sm ring-1 ring-white/80">
             @switch($variant)
@@ -132,5 +140,5 @@
                     </svg>
             @endswitch
         </div>
-    @endif
+    </div>
 </div>

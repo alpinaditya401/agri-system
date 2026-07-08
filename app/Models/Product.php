@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -66,13 +67,23 @@ class Product extends Model
         }
 
         if (Str::startsWith($this->main_image, '/')) {
-            return url($this->main_image);
+            $publicPath = public_path(ltrim($this->main_image, '/'));
+
+            return file_exists($publicPath) ? url($this->main_image) : null;
         }
 
-        if (Str::startsWith($this->main_image, ['storage/', 'images/'])) {
-            return asset($this->main_image);
+        if (Str::startsWith($this->main_image, 'storage/')) {
+            $path = Str::after($this->main_image, 'storage/');
+
+            return Storage::disk('public')->exists($path) ? asset($this->main_image) : null;
         }
 
-        return asset('storage/' . ltrim($this->main_image, '/'));
+        if (Str::startsWith($this->main_image, 'images/')) {
+            return file_exists(public_path($this->main_image)) ? asset($this->main_image) : null;
+        }
+
+        $path = ltrim($this->main_image, '/');
+
+        return Storage::disk('public')->exists($path) ? asset('storage/' . $path) : null;
     }
 }

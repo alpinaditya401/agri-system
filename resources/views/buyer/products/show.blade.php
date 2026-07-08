@@ -47,7 +47,9 @@
                     @if ($product->images->isNotEmpty())
                         <div class="flex gap-3 overflow-x-auto pb-1 ag-no-scrollbar">
                             @foreach ($product->images as $img)
-                                <img src="{{ asset($img->image_path) }}" alt="{{ $product->name }}" loading="lazy" class="h-20 w-20 flex-shrink-0 rounded-2xl border border-slate-200 object-cover shadow-sm">
+                                @if ($img->image_url)
+                                    <img src="{{ $img->image_url }}" alt="{{ $product->name }}" loading="lazy" class="h-20 w-20 flex-shrink-0 rounded-2xl border border-slate-200 object-cover shadow-sm" onerror="this.remove()">
+                                @endif
                             @endforeach
                         </div>
                     @endif

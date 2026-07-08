@@ -10,6 +10,8 @@ use App\Services\FertilizerQuotaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class FertilizerTransactionController extends Controller
@@ -119,6 +121,15 @@ class FertilizerTransactionController extends Controller
         return back()->with('success', 'Permintaan pupuk ditolak.');
     }
 
+    public function redirectDispense(FertilizerTransaction $transaction): RedirectResponse
+    {
+        $this->authorizeDistributorTransaction($transaction);
+
+        return redirect()
+            ->route('distributor.fertilizer.show', $transaction)
+            ->with('error', 'Gunakan tombol "Tandai Diserahkan" dari halaman detail transaksi agar prosesnya aman.');
+    }
+
     public function dispense(FertilizerTransaction $transaction): RedirectResponse
     {
         $this->authorizeDistributorTransaction($transaction);
@@ -127,26 +138,63 @@ class FertilizerTransactionController extends Controller
             return back()->with('error', 'Transaksi harus disetujui terlebih dahulu sebelum diserahkan.');
         }
 
-        $approvedKg = $transaction->approved_kg ?? $transaction->requested_kg;
+        $approvedKg = (int) ($transaction->approved_kg ?? $transaction->requested_kg);
 
-        // Deduct stock and release reservation
-        $stock = FertilizerStock::where('distributor_id', Auth::id())
-            ->where('fertilizer_type_id', $transaction->fertilizer_type_id)
-            ->first();
-
-        if ($stock) {
-            $stock->decrement('stock_kg', $approvedKg);
-            $stock->decrement('reserved_kg', $transaction->requested_kg);
+        if ($approvedKg < 1) {
+            return back()->with('error', 'Jumlah pupuk yang disetujui tidak valid.');
         }
 
-        // Mark quota as used
-        $this->quotaService->markAsUsed($transaction->fertilizer_quota_id, $approvedKg);
+        try {
+            DB::transaction(function () use ($transaction, $approvedKg) {
+                $lockedTransaction = FertilizerTransaction::whereKey($transaction->id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-        $transaction->update([
-            'status'       => 'dispensed',
-            'dispensed_at' => now(),
-            'processed_by' => Auth::id(),
-        ]);
+                if ($lockedTransaction->status !== 'approved') {
+                    throw new \RuntimeException('Transaksi sudah tidak dapat ditandai diserahkan.');
+                }
+
+                $stock = FertilizerStock::where('distributor_id', Auth::id())
+                    ->where('fertilizer_type_id', $lockedTransaction->fertilizer_type_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $stock) {
+                    throw new \RuntimeException('Stok distributor untuk jenis pupuk ini tidak ditemukan.');
+                }
+
+                if ((int) $stock->stock_kg < $approvedKg) {
+                    throw new \RuntimeException("Stok tidak mencukupi. Stok saat ini: {$stock->stock_kg} kg.");
+                }
+
+                $reservedToRelease = min((int) $lockedTransaction->requested_kg, (int) $stock->reserved_kg);
+
+                $stock->update([
+                    'stock_kg' => max(0, (int) $stock->stock_kg - $approvedKg),
+                    'reserved_kg' => max(0, (int) $stock->reserved_kg - $reservedToRelease),
+                ]);
+
+                $this->quotaService->markAsUsed((int) $lockedTransaction->fertilizer_quota_id, $approvedKg);
+
+                $lockedTransaction->update([
+                    'status'       => 'dispensed',
+                    'dispensed_at' => now(),
+                    'processed_by' => Auth::id(),
+                ]);
+            });
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('Failed to dispense fertilizer transaction', [
+                'transaction_id' => $transaction->id,
+                'distributor_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Pupuk belum bisa ditandai diserahkan. Cek stok, kuota, lalu coba lagi.');
+        }
+
+        $transaction->refresh();
 
         Notification::sendToUser(
             userId: $transaction->farmer_id,

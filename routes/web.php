@@ -234,6 +234,7 @@ Route::middleware(['auth', 'role:distributor'])
     Route::get('transaksi-pupuk/{transaction}', [FertilizerTransactionController::class, 'show'])->name('fertilizer.show');
     Route::patch('transaksi-pupuk/{transaction}/setujui', [FertilizerTransactionController::class, 'approve'])->name('fertilizer.approve');
     Route::patch('transaksi-pupuk/{transaction}/tolak', [FertilizerTransactionController::class, 'reject'])->name('fertilizer.reject');
+    Route::get('transaksi-pupuk/{transaction}/serahkan', [FertilizerTransactionController::class, 'redirectDispense'])->name('fertilizer.dispense.redirect');
     Route::patch('transaksi-pupuk/{transaction}/serahkan', [FertilizerTransactionController::class, 'dispense'])->name('fertilizer.dispense');
 });
 
